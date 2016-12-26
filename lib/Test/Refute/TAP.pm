@@ -2,13 +2,14 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.01;
+our $VERSION = 0.0101;
 
 use parent qw(Test::Refute::Engine);
 
 sub new {
     my ($class, %opt) = @_;
 
+    # dup2 STDOUT so that we aren't botched by furthe redirect
     my $fd = delete $opt{fd} || \*STDOUT;
     open (my $dup, ">&", $fd)
         or die "redirect failed: $!";
@@ -30,8 +31,7 @@ sub on_fail {
     
     my $fd = $self->{out};
     print $fd "not ok $self->{count} - $test\n";
-    $self->diag( "Failed test '$test'" );
-    $self->diag( Carp::shortmess( "" ) );
+    $self->diag( Carp::shortmess("Failed test '$test'") );
 };
 
 sub note {
@@ -41,7 +41,7 @@ sub diag {
     my ($self, $msg) = @_;
 
     my $fd = $self->{out};
-    print $fd "# $_\n" for split /\n/, $msg;
+    print $fd "# $_\n" for split /\n+/, $msg;
 };
 
 sub on_done {

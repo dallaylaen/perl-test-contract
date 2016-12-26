@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = 0.0101;
 
 =head1 NAME
 
@@ -23,6 +23,7 @@ use Carp;
 use parent qw(Exporter);
 our @EXPORT = (qw(done_testing note diag), @Test::Refute::Engine::Basic);
 
+use Test::Refute::Engine;
 use Test::Refute::TAP;
 
 sub import {
@@ -43,9 +44,7 @@ foreach (@EXPORT) {
     my $name = $_;
 
     my $code = sub (@) {
-        $Test::Refute::Engine::Default
-            or croak "$name(): Not currently testing anything";
-        $Test::Refute::Engine::Default->$name(@_);
+        Test::Refute::Engine::refute_engine->$name(@_);
     };
 
     no strict 'refs';

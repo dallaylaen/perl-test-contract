@@ -8,7 +8,7 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 use parent qw(Exporter);
 
-our @EXPORT_OK = qw(build_refute);
+our @EXPORT_OK = qw(build_refute refute_engine);
 
 # TODO or should we swap args?
 sub refute {
@@ -102,6 +102,11 @@ sub build_refute(@) {
     };
 
     return 1;
+};
+
+sub refute_engine {
+    $Default or croak [caller]->[3].": Not currently testing anything";
+    return $Default;
 };
 
 sub get_impl {
