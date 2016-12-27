@@ -11,6 +11,18 @@ Test::Refute - a lightweight unit-testing and assertion tool.
 
 =head1 SYNOPSIS
 
+The following is a prove-compatible test script.
+
+    use strict;
+    use warnings;
+    use Test::Refute;
+
+    use_ok( "My::Module" );
+
+    is (My::Module->answer, 42, "Life, universe, and everything");
+
+    done_testing;
+
 =head1 EXPORT
 
 All functions in this module are exported by default.
@@ -23,21 +35,25 @@ use Carp;
 use parent qw(Exporter);
 our @EXPORT = (qw(done_testing note diag), @Test::Refute::Engine::Basic);
 
-use Test::Refute::Engine;
+use Test::Refute::Engine qw(refute_engine);
 use Test::Refute::TAP;
 
+my $main_engine;
 sub import {
-    $Test::Refute::Engine::Default = Test::Refute::TAP->new;
+    $main_engine = Test::Refute::TAP->new;
+    $main_engine->start_testing;
     goto &Exporter::import;
 };
 
 END {
-    $Test::Refute::Engine::Default->{done}
-         or croak "done_testing was not seen";
+    if ($main_engine) {
+        $main_engine->is_done
+             or croak "done_testing was not seen";
 
-    my $ret = $Test::Refute::Engine::Default->errors;
-    $ret = 100 if $ret > 100;
-    $? = $ret;
+        my $ret = $main_engine->error_count;
+        $ret = 100 if $ret > 100;
+        $? = $ret;
+    };
 };
 
 foreach (@EXPORT) {
