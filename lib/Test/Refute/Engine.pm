@@ -2,7 +2,7 @@ package Test::Refute::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -96,6 +96,9 @@ use parent qw(Exporter);
 
 our @EXPORT_OK = qw(build_refute refute_engine);
 
+# preload most basic tests
+require Test::Refute::Basic;
+
 =head2 build_refute
 
 =cut
@@ -131,8 +134,10 @@ sub build_refute(@) {
     *{ $class."::$name" } = $method;
     if (! $opt{no_create} ) {
         *{ $opt{target}."::$name" } = $wrapper;
-        push @{ $opt{target}."::EXPORT_OK" }, $name
+        push @{ $opt{target}."::EXPORT" }, $name
             if $opt{export};
+        push @{ $opt{target}."::EXPORT_OK" }, $name
+            if $opt{export_ok};
     };
 
     return 1;
@@ -278,33 +283,5 @@ sub note {
 sub on_done {
     croak "on_done(): Unimplemented";
 };
-
-# build basic stuff
-our @Basic;
-
-push @Basic, 'is';
-build_refute is => sub {
-    my ($got, $exp) = @_;
-
-    return '' if $got eq $exp;
-    return "Got:      $got\nExpected: $exp";
-}, args => 2, no_create => 1;
-
-push @Basic, 'ok';
-build_refute ok => sub {
-    my $got = shift;
-
-    return !$got;
-}, args => 1, no_create => 1;
-
-push @Basic, 'use_ok';
-build_refute use_ok => sub {
-    my $mod = shift;
-    my $file = $mod;
-    $file =~ s#::#/#g;
-    $file .= ".pm";
-    eval { require $file; $mod->import; 1 } and return '';
-    return $@ || "Failed to load $mod";
-}, args => 1, no_create => 1;
 
 1;

@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -32,23 +32,21 @@ All functions in this module are exported by default.
 =cut
 
 use Carp;
-use parent qw(Exporter);
-my @test = (qw(done_testing note diag), @Test::Refute::Engine::Basic);
-our @EXPORT = (@test, qw(contract) );
 
 use Test::Refute::Engine qw(refute_engine);
 use Test::Refute::TAP;
 use Test::Refute::Contract;
+use Test::Refute::Basic;
 
-my $main_engine;
-sub import {
-    $main_engine = Test::Refute::TAP->new;
-    $main_engine->start_testing;
-    goto &Exporter::import;
-};
+use parent qw(Exporter);
+my @test = qw(done_testing note diag);
+our @EXPORT = (@test, qw(contract), @Test::Refute::Basic::EXPORT );
+
+my $main_engine = Test::Refute::TAP->new;
+$main_engine->start_testing;
 
 END {
-    if ($main_engine) {
+    if ($main_engine and $main_engine->current_test) {
         $main_engine->is_done
              or croak "done_testing was not seen";
 
