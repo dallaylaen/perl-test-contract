@@ -6,7 +6,7 @@ use warnings;
 use Test::Refute;
 use Test::Refute::TAP;
 
-sub contract_out (&);
+sub contract_out (&;$);
 
 my $content;
 
@@ -27,28 +27,38 @@ is $content, "ok 1 - Equal\n1..1\n", "is happy path";
 
 $content = contract_out {
     is (1, 0, "False");
-};
-$content =~ s/#.*?\n//gs;
+} 1;
 is $content, "not ok 1 - False\n1..1\n", "is when it really isn't";
-
-note "Some cmp_ok modes";
 
 $content = contract_out {
     cmp_ok( 1, ">", 0, "more" );
     cmp_ok( 1, "<", 0, "no more" );
-};
-$content =~ s/#.*?\n//gs;
-is $content, "ok 1 - more\nnot ok 2 - no more\n1..2\n", "cmp_ok";
+} 1;
+is $content, "ok 1 - more\nnot ok 2 - no more\n1..2\n", "cmp_ok smoke";
+
+$content = contract_out {
+    like( 42, '\d', "unlike" );
+    like( 42, '\d+', "like" );
+} 1;
+is $content, "not ok 1 - unlike\nok 2 - like\n1..2\n", "like smoke";
+
+$content = contract_out {
+    ilike( 'A', 'a', "ilike" );
+    ilike( 'AA', 'a', "not ilike" );
+} 1;
+is $content, "ok 1 - ilike\nnot ok 2 - not ilike\n1..2\n", "ilike smoke";
 
 done_testing;
 
-sub contract_out(&) {
-    my ($code) = @_;
+sub contract_out(&;$) {
+    my ($code, $strip) = @_;
 
     my $content = '';
     open my $fd, ">", \$content
         or die "Failed to redirect: $!";
 
     &contract( $code, Test::Refute::TAP->new( fd => $fd ) );
+    $content =~ s/#.*?\n//gs
+        if $strip;
     return $content;
 };

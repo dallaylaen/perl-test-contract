@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our @VERSION = 0.0102;
+our @VERSION = 0.0103;
 
 use parent qw(Exporter);
 use Test::Refute::Engine qw(build_refute);
@@ -44,6 +44,22 @@ if (!@EXPORT) {
         return '' if $compare{$op}->($x, $y);
         return "$x\nis not '$op'\n$y";
     }, args => 3, export => 1;
+
+    build_refute like => sub {
+        my ($str, $reg) = @_;
+
+        $reg = qr#^(?:$reg)$#;
+        return '' if $str =~ $reg;
+        return "$str\ndoesn't match\n$reg";
+    }, args => 2, export => 1;
+
+    build_refute ilike => sub {
+        my ($str, $reg) = @_;
+
+        $reg = qr#^(?:$reg)$#i;
+        return '' if $str =~ $reg;
+        return "$str\ndoesn't match\n$reg";
+    }, args => 2, export => 1;
 }; # end (if !@EXPORT)
 
 1;
