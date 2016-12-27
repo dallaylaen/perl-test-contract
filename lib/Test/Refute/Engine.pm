@@ -2,7 +2,7 @@ package Test::Refute::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 =head1 NAME
 
@@ -199,6 +199,11 @@ sub refute {
 
     $self->on_pass( $message );
     return $self->{count};
+};
+
+sub current_test {
+    my $self = shift;
+    return $self->{count} || 0;
 };
 
 =head2 start_testing

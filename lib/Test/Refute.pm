@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 =head1 NAME
 
@@ -33,10 +33,12 @@ All functions in this module are exported by default.
 
 use Carp;
 use parent qw(Exporter);
-our @EXPORT = (qw(done_testing note diag), @Test::Refute::Engine::Basic);
+my @test = (qw(done_testing note diag), @Test::Refute::Engine::Basic);
+our @EXPORT = (@test, qw(contract) );
 
 use Test::Refute::Engine qw(refute_engine);
 use Test::Refute::TAP;
+use Test::Refute::Contract;
 
 my $main_engine;
 sub import {
@@ -56,7 +58,18 @@ END {
     };
 };
 
-foreach (@EXPORT) {
+sub contract (&;$) {
+    my ($code, $engine) = @_;
+
+    $engine ||= Test::Refute::Contract->new;
+    $engine->start_testing;
+
+    $code->();
+    $engine->done_testing;
+    return $engine;
+};
+
+foreach (@test) {
     my $name = $_;
 
     my $code = sub (@) {
