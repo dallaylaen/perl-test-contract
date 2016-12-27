@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 use parent qw(Test::Refute::Engine);
 
@@ -11,8 +11,8 @@ sub new {
 
     # dup2 STDOUT so that we aren't botched by furthe redirect
     my $fd = delete $opt{fd} || \*STDOUT;
-#    open (my $dup, ">&", $fd)
-#        or die "redirect failed: $!";
+    open (my $dup, ">&", $fd)
+        or die "redirect failed: $!";
 
     $opt{out} = $fd;
     $opt{count} = 0;
@@ -23,7 +23,8 @@ sub new {
 sub on_pass {
     my ($self, $test) = @_;
 
-    print "ok $self->{count} - $test\n";
+    my $fd = $self->{out};
+    print $fd "ok $self->{count} - $test\n";
 };
 
 sub on_fail {
