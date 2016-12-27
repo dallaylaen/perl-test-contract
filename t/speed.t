@@ -2,9 +2,17 @@
 
 use strict;
 use warnings;
-use Test::Refute;
+my ($engine, $count) = @ARGV;
 
-my $count = shift || 0;
+$engine ||= 'Test::Refute';
+$count  ||= 0;
+
+my $fname = $engine;
+$fname =~ s#::#/#g;
+$fname .= ".pm";
+
+require $fname;
+$engine->import();
 
 ok (1);
 
@@ -12,4 +20,4 @@ for (1 .. $count) {
     is (int(rand() * 1.1), 0, "Random fail" );
 };
 
-done_testing;
+done_testing();
