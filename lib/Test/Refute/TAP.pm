@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 use parent qw(Test::Refute::Engine);
 
@@ -11,10 +11,10 @@ sub new {
 
     # dup2 STDOUT so that we aren't botched by furthe redirect
     my $fd = delete $opt{fd} || \*STDOUT;
-    open (my $dup, ">&", $fd)
-        or die "redirect failed: $!";
+#    open (my $dup, ">&", $fd)
+#        or die "redirect failed: $!";
 
-    $opt{out} = $dup;
+    $opt{out} = $fd;
     $opt{count} = 0;
 
     return bless \%opt, $class;
@@ -47,7 +47,7 @@ sub diag {
 sub on_done {
     my $self = shift;
     my $fd = $self->{out};
-    print $fd "1..$self->{count}";
+    print $fd "1..$self->{count}\n";
 };
 
 sub DESTROY {
