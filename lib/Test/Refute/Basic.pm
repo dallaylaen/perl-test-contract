@@ -2,12 +2,14 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
+our @VERSION = 0.0102;
 
 use parent qw(Exporter);
 use Test::Refute::Engine qw(build_refute);
 
-our @EXPORT_OK;
-if (!@EXPORT_OK) {
+our @EXPORT;
+if (!@EXPORT) {
+    # Avoid initializing twice. (Engine has a circular dependency on us)
     # build basic stuff
 
     build_refute is => sub {
@@ -31,6 +33,17 @@ if (!@EXPORT_OK) {
         eval { require $file; $mod->import; 1 } and return '';
         return $@ || "Failed to load $mod";
     }, args => 1, export => 1;
+
+    my %compare;
+    $compare{$_} = eval "sub { return \$_[0] $_ \$_[1]; }"
+        for qw( < <= == != >= > lt le eq ne ge gt );
+
+    build_refute cmp_ok => sub {
+        my ($x, $op, $y) = @_;
+
+        return '' if $compare{$op}->($x, $y);
+        return "$x\nis not '$op'\n$y";
+    }, args => 3, export => 1;
 }; # end (if !@EXPORT)
 
 1;

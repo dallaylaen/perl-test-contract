@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 use parent qw(Test::Refute::Engine);
 
@@ -36,6 +36,10 @@ sub on_fail {
 };
 
 sub note {
+    my ($self, $msg) = @_;
+
+    my $fd = $self->{out};
+    print $fd "## $_\n" for split /\n+/, $msg;
 };
 
 sub diag {
