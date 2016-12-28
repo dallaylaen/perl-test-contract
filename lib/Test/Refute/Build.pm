@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 use Carp;
 use parent qw(Exporter);
@@ -14,6 +14,7 @@ our @EXPORT = qw(build_refute refute_engine);
 
 my %Backend;
 my %Carp_not;
+my $trash_can = __PACKAGE__."::generated::For::Cover::To::See";
 
 sub build_refute(@) {
     my ($name, $cond, %opt) = @_;
@@ -46,6 +47,8 @@ sub build_refute(@) {
 
     no strict 'refs';
     *{ $class."::$name" } = $method;
+    # FIXME UGLY HACK - somehow it makes Devel::Cover see the code in report
+    *{ $trash_can."::$name" } = $cond;
     if ($todo_create) {
         *{ $target."::$name" } = $wrapper;
         push @{ $target."::".$export }, $name
