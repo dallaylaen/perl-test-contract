@@ -2,11 +2,13 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 use Carp;
+use Scalar::Util qw(weaken blessed);
 use parent qw(Exporter);
 our @EXPORT = qw(build_refute refute_engine);
+our @EXPORT_OK = qw(refute_engine_push refute_engine_cleanup);
 
 =head2 build_refute
 
@@ -77,16 +79,18 @@ sub refute_engine() {
 
 sub refute_engine_push {
     my $eng = shift;
-    $eng->isa( "Test::Refute::Engine" )
+    blessed $eng and $eng->isa( "Test::Refute::Engine" )
         or croak( "refute_engine_push(): won't load anything but Test::Refute::Engine" );
     push @stack, $eng;
+    weaken $stack[-1];
+    return scalar @stack;
 };
 
 sub refute_engine_cleanup {
-    while (@stack and $stack[-1]->is_done) {
+    while (@stack and (!$stack[-1] or $stack[-1]->is_done)) {
         pop @stack;
     };
-    return;
+    return scalar @stack;
 };
 
 1;

@@ -2,7 +2,7 @@ package Test::Refute::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 =head1 NAME
 
@@ -178,6 +178,10 @@ sub done_testing {
     $self->on_done;
 
     return $self;
+};
+
+sub DESTROY {
+    Test::Refute::Build::refute_engine_cleanup();
 };
 
 sub is_done {
