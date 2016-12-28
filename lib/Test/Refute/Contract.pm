@@ -72,8 +72,11 @@ sub _log {
 };
 
 sub get_tap {
-    my $self = shift;
-    return join "\n", @{ $self->{log} };
+    my ($self, $verbose) = @_;
+
+    $verbose = 1 unless defined $verbose;
+    $verbose++;
+    return join "\n", grep { !/^#{$verbose}/ } @{ $self->{log} }, '';
 };
 
 sub get_failed {
