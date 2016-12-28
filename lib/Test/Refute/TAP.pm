@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0105;
+our $VERSION = 0.0107;
 
 use Carp;
 use parent qw(Test::Refute::Contract);
@@ -21,39 +21,11 @@ sub new {
     return bless \%opt, $class;
 };
 
-sub on_pass {
-    my ($self, $test) = @_;
+sub _log {
+    my ($self, $mess) = @_;
 
     my $fd = $self->{out};
-    print $fd "ok $self->{count} - $test\n";
-};
-
-sub on_fail {
-    my ($self, $test) = @_;
-    
-    my $fd = $self->{out};
-    print $fd "not ok $self->{count} - $test\n";
-    $self->diag( Carp::shortmess("Failed test '$test'") );
-};
-
-sub note {
-    my ($self, $msg) = @_;
-
-    my $fd = $self->{out};
-    print $fd "## $_\n" for split /\n+/, $msg;
-};
-
-sub diag {
-    my ($self, $msg) = @_;
-
-    my $fd = $self->{out};
-    print $fd "# $_\n" for split /\n+/, $msg;
-};
-
-sub on_done {
-    my $self = shift;
-    my $fd = $self->{out};
-    print $fd "1..$self->{count}\n";
+    print $fd "$mess\n";
 };
 
 sub get_tap {

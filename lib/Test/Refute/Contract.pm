@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -170,7 +170,13 @@ sub diag {
     return;
 };
 
-sub note {}; # TODO
+sub note {
+    my ($self, $mess) = @_;
+
+    $self->_log( join " ", "##", $_ )
+        for split /\n+/, $mess;
+    return;
+};
 
 sub on_done {
     my $self = shift;
