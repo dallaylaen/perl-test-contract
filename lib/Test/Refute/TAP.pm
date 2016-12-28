@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0107;
+our $VERSION = 0.0108;
 
 use Carp;
 use parent qw(Test::Refute::Contract);
@@ -24,6 +24,7 @@ sub new {
 sub _log {
     my ($self, $mess) = @_;
 
+    $mess =~ s#\n+$##s;
     my $fd = $self->{out};
     print $fd "$mess\n";
 };

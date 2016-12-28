@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.0105;
 
 =head1 NAME
 
@@ -91,12 +91,12 @@ All functions in this module are exported by default.
 use Carp;
 
 use Test::Refute::Build qw(refute_engine);
-use Test::Refute::TAP;
-use Test::Refute::Contract;
 use Test::Refute::Basic;
+use Test::Refute::Contract qw(contract);
+use Test::Refute::TAP;
 
 use parent qw(Exporter);
-my @test = qw(done_testing note diag);
+my @test = qw(done_testing note diag bail_out);
 our @EXPORT = (@test, qw(contract), @Test::Refute::Basic::EXPORT );
 
 =head1 TESTS
@@ -116,13 +116,17 @@ Record a human-readable sidenote.
 Finish testing, no more tests in the current batch
 can be executed after this call.
 
+=head2 bail_out( $text )
+
+Stop testing here, interrupting all further testing.
+
 =cut
 
 my $main_engine = Test::Refute::TAP->new;
 $main_engine->start_testing;
 
 END {
-    if ($main_engine->current_test) {
+    if ($main_engine->test_number) {
         $main_engine->is_done
              or croak "done_testing was not seen";
 
@@ -148,33 +152,10 @@ foreach (@test) {
 =head2 contract { CODE; } $refute_object;
 
 Run an enclosed set of tests, recording the results for future analysis.
-Returns an L<Test::Refute::Contract> instance.
-It can be queried via
-
-=over
-
-=item * $contract->is_valid (1|0)
-
-=item * $contract->test_number - number of tests run
-
-=item * $contract->error_count - number of failed tests
-
-=back
-
-More methods to follow.
+Returns a contract object.
+See GETTERS in L<Test::Refute::Contract> for reference.
 
 =cut
-
-sub contract (&;$) {
-    my ($code, $engine) = @_;
-
-    $engine ||= Test::Refute::Contract->new;
-    $engine->start_testing;
-
-    $code->();
-    $engine->done_testing;
-    return $engine;
-};
 
 =head1 AUTHOR
 
