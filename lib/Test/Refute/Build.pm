@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 use Carp;
 use parent qw(Exporter);
@@ -35,7 +35,8 @@ sub build_refute(@) {
         return $self->refute( $cond->(@_), $message );
     };
     my $wrapper = sub {
-        return refute_engine()->$name( @_ );
+        my $message = pop unless @_ <= $nargs;
+        return refute_engine()->refute( $cond->(@_), $message );
     };
 
     $Backend{$name}   = $target;
