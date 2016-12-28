@@ -84,9 +84,7 @@ Creating more test engines:
 The two can be combined, i.e. requiring My::Test somewhere will make
 long_enough available to all Engine's descendants.
 
-=head1 EXPORTS
-
-Both build_refute and refute_engine are optional exports.
+=head1 METHODS
 
 =cut
 
@@ -97,10 +95,6 @@ use Test::Refute::Build ();
 
 # preload most basic tests
 require Test::Refute::Basic;
-
-=head1 OBJECT-ORIENTED INTERFACE
-
-OO interface allows to build contracts, subtests, customizable asserts etc.
 
 =head2 new()
 
@@ -202,7 +196,10 @@ sub error_count {
     return $self->{fails} || 0;
 };
 
-=head1 METHODS TO IMPLEMENT
+# TODO Merge Engine & Contract
+
+=head1 SUBCLASS METHODS
+
 
 =cut
 

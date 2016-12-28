@@ -11,7 +11,7 @@ Test::Refute - a lightweight unit-testing and assertion tool.
 
 =head1 SYNOPSIS
 
-The following is a prove-compatible test script.
+The following is a prove-compatible test script. (See L<Test::More>).
 
     use strict;
     use warnings;
@@ -21,7 +21,64 @@ The following is a prove-compatible test script.
 
     is (My::Module->answer, 42, "Life, universe, and everything");
 
-    done_testing;
+    done_testing; # required
+
+However, it can also work inside an application:
+
+    use Test::Refute qw(contract);
+
+    my $contract = contract {
+        is ($user_input->{foo}, $bar, "Input as expected" );
+        like ($user_input->{baz}, qr/f?o?r?m?a?t?/, "Format good" );
+    };
+    if (!$contract->is_valid) {
+        ...
+    };
+
+Or using the OO interface, if you prefer:
+
+    use Test::Refute::Contract;
+    my $contract = Test::Refute::Contract->new;
+    $contract->like( $something, $something_else );
+    $contract->done_testing; # this may be omitted
+    if (!$contract->is_valid) {
+        ...
+    };
+
+There's also the central point of this module - the inverted assertion:
+
+    $contract->refute ( $what_exactly_went_wrong, $human_explanation);
+    # silent if arg1 is false, complains otherwise
+
+In theory, there should also be an assertion wrapper that dies on failed
+conditions and optimizes itself out if needed. That's not done yet.
+
+Extending the test suite goes as follows:
+
+    package My::Package;
+    use Test::Refute::Build;
+    use parent qw(Exporter);
+
+    build_refute is_everything => sub {
+        return if $_[0] == 42;
+        return "$_[0] is not answer to life, universe, abd everything";
+    }, export => 1, args => 1;
+
+    1;
+
+The function provided to builder must return a false value if everything is ok,
+or some details (but generally any true value) if not.
+
+This call will create a prototyped function is_everything(...) in the calling
+package, with C<args> positional parameters and an optional human-readable
+message. (Think "ok 1", "ok 1 'test passed'").
+
+It will also create a corresponding is_everything method in
+L<Test::Refute::Engine> package so that OO interface described above
+is always on par with functional one.
+This is the main reason to need a builder at all.
+Suggestions how to reduce it even more are welcome.
+See L<Test::Refute::Build>.
 
 =head1 EXPORT
 
@@ -42,6 +99,25 @@ use parent qw(Exporter);
 my @test = qw(done_testing note diag);
 our @EXPORT = (@test, qw(contract), @Test::Refute::Basic::EXPORT );
 
+=head1 TESTS
+
+See L<Test::Refute::Basic> for checks allowed by default.
+
+=head2 diag( $text )
+
+Record a human-readable diagnostic message.
+
+=head2 note( $text )
+
+Record a human-readable sidenote.
+
+=head2 done_testing;
+
+Finish testing, no more tests in the current batch
+can be executed after this call.
+
+=cut
+
 my $main_engine = Test::Refute::TAP->new;
 $main_engine->start_testing;
 
@@ -56,17 +132,6 @@ END {
     };
 };
 
-sub contract (&;$) {
-    my ($code, $engine) = @_;
-
-    $engine ||= Test::Refute::Contract->new;
-    $engine->start_testing;
-
-    $code->();
-    $engine->done_testing;
-    return $engine;
-};
-
 foreach (@test) {
     my $name = $_;
 
@@ -76,6 +141,40 @@ foreach (@test) {
 
     no strict 'refs';
     *$name = $code;
+};
+
+=head2 contract { CODE; };
+
+=head2 contract { CODE; } $refute_object;
+
+Run an enclosed set of tests, recording the results for future analysis.
+Returns an L<Test::Refute::Engine> instance
+(by default a L<Test::Refute::Contract>).
+It can be queried via
+
+=over
+
+=item * $contract->is_valid (1|0)
+
+=item * $contract->test_number - number of tests run
+
+=item * $contract->error_count - number of failed tests
+
+=back
+
+More methods to follow.
+
+=cut
+
+sub contract (&;$) {
+    my ($code, $engine) = @_;
+
+    $engine ||= Test::Refute::Contract->new;
+    $engine->start_testing;
+
+    $code->();
+    $engine->done_testing;
+    return $engine;
 };
 
 =head1 AUTHOR
