@@ -33,7 +33,7 @@ All functions in this module are exported by default.
 
 use Carp;
 
-use Test::Refute::Engine qw(refute_engine);
+use Test::Refute::Build qw(refute_engine);
 use Test::Refute::TAP;
 use Test::Refute::Contract;
 use Test::Refute::Basic;
@@ -46,7 +46,7 @@ my $main_engine = Test::Refute::TAP->new;
 $main_engine->start_testing;
 
 END {
-    if ($main_engine and $main_engine->current_test) {
+    if ($main_engine->current_test) {
         $main_engine->is_done
              or croak "done_testing was not seen";
 
@@ -71,7 +71,7 @@ foreach (@test) {
     my $name = $_;
 
     my $code = sub (@) {
-        Test::Refute::Engine::refute_engine->$name(@_);
+        refute_engine->$name(@_);
     };
 
     no strict 'refs';

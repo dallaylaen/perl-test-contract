@@ -92,69 +92,11 @@ Both build_refute and refute_engine are optional exports.
 
 use Carp;
 use Scalar::Util qw(looks_like_number);
-use parent qw(Exporter);
 
-our @EXPORT_OK = qw(build_refute refute_engine);
+use Test::Refute::Build ();
 
 # preload most basic tests
 require Test::Refute::Basic;
-
-=head2 build_refute
-
-=cut
-
-my %Backend;
-
-sub build_refute(@) {
-    my ($name, $cond, %opt) = @_;
-
-    my $class = __PACKAGE__;
-
-    if (my $backend = ( $class->can($name) ? $class : $Backend{$name} ) ) {
-        croak "build_refute(): '$name' already registered by $backend";
-    };
-
-    $opt{target} ||= caller;
-
-    my $nargs = $opt{args} || 0;
-
-    my $method  = sub {
-        my $self = shift;
-        my $message = pop unless @_ <= $nargs;
-
-        return $self->refute( $cond->(@_), $message );
-    };
-    my $wrapper = sub {
-        return refute_engine()->$name( @_ );
-    };
-
-    $Backend{$name} = $opt{target};
-
-    no strict 'refs';
-    *{ $class."::$name" } = $method;
-    if (! $opt{no_create} ) {
-        *{ $opt{target}."::$name" } = $wrapper;
-        push @{ $opt{target}."::EXPORT" }, $name
-            if $opt{export};
-        push @{ $opt{target}."::EXPORT_OK" }, $name
-            if $opt{export_ok};
-    };
-
-    return 1;
-};
-
-=head2 refute_engine
-
-Returns current default engine, dies if none right now.
-
-=cut
-
-my @stack;
-
-sub refute_engine() {
-    @stack or croak [caller]->[3]."(): Not currently testing anything";
-    return $stack[-1];
-};
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -222,7 +164,7 @@ sub start_testing {
     my $self = shift;
 
     $self->{count} and croak "start_testing() called after tests";
-    push @stack, $self;
+    Test::Refute::Build::refute_engine_push( $self );
 
     return $self;
 };
@@ -237,11 +179,7 @@ sub done_testing {
     my $self = shift;
 
     $self->{done}++ and croak "done_testing() called twice";
-
-    # Some overengineered trash to make subtests and tests of suite itself work
-    while (@stack and $stack[-1]->is_done) {
-        pop @stack;
-    };
+    Test::Refute::Build::refute_engine_cleanup();
 
     $self->on_done;
 
