@@ -1,9 +1,19 @@
 Changes
 lib/Test/Refute.pm
-lib/Test/Refute/Engine.pm
+lib/Test/Refute/Basic.pm
+lib/Test/Refute/Contract.pm
+lib/Test/Refute/Exception.pm
 lib/Test/Refute/TAP.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/001-require-basic.t
+t/002-bootstrap.t
 t/101-smoke.t
+t/103-test-tap.t
+t/201-contract-smoke.t
+t/202-exception.t
+t/speed.t
+xt/pod-coverage.t
+xt/pod.t
