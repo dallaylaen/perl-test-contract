@@ -12,7 +12,7 @@ use Test::Refute::Basic;
 {
     package My::Bootstrap;
     use Carp;
-    our @ISA = qw(Test::Refute::Engine);
+    our @ISA = qw(Test::Refute::Contract);
     our @CARP_NOT = qw(Test::Refute::Basic);
 
     sub new { bless {}, shift };
@@ -33,7 +33,7 @@ use Test::Refute::Basic;
     };
     sub is_done { 0; }; # forever
 
-    package Test::Refute::Engine;
+    package Test::Refute::Contract;
     our $VERSION = 0;
 };
 

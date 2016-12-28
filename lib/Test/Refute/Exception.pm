@@ -2,14 +2,13 @@ package Test::Refute::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 use Carp;
 use parent qw(Exporter);
 our @EXPORT = qw(dies lives_ok);
 
 use Test::Refute::Build qw(build_refute refute_engine);
-our @CARP_NOT = qw(Test::Refute::Engine); # TODO this should be auto
 
 build_refute dies => sub {
     my ($code, $expr) = @_;

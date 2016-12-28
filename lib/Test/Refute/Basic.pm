@@ -2,13 +2,9 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 use parent qw(Exporter);
-
-# This is really
-# use Test::Refute::Engine qw(build_refute)
-# Need to load by hand to avoid circular dependencies
 use Test::Refute::Build qw(build_refute refute_engine);
 
 build_refute is => sub {

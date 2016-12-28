@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ package, with C<args> positional parameters and an optional human-readable
 message. (Think "ok 1", "ok 1 'test passed'").
 
 It will also create a corresponding is_everything method in
-L<Test::Refute::Engine> package so that OO interface described above
+L<Test::Refute::Contract> package so that OO interface described above
 is always on par with functional one.
 This is the main reason to need a builder at all.
 Suggestions how to reduce it even more are welcome.
@@ -148,8 +148,7 @@ foreach (@test) {
 =head2 contract { CODE; } $refute_object;
 
 Run an enclosed set of tests, recording the results for future analysis.
-Returns an L<Test::Refute::Engine> instance
-(by default a L<Test::Refute::Contract>).
+Returns an L<Test::Refute::Contract> instance.
 It can be queried via
 
 =over

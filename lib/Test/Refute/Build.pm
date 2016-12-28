@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.0105;
 
 use Carp;
 use Scalar::Util qw(weaken blessed);
@@ -21,7 +21,7 @@ my $trash_can = __PACKAGE__."::generated::For::Cover::To::See";
 sub build_refute(@) {
     my ($name, $cond, %opt) = @_;
 
-    my $class = "Test::Refute::Engine";
+    my $class = "Test::Refute::Contract";
 
     if (my $backend = ( $class->can($name) ? $class : $Backend{$name} ) ) {
         croak "build_refute(): '$name' already registered by $backend";
@@ -79,8 +79,8 @@ sub refute_engine() {
 
 sub refute_engine_push {
     my $eng = shift;
-    blessed $eng and $eng->isa( "Test::Refute::Engine" )
-        or croak( "refute_engine_push(): won't load anything but Test::Refute::Engine" );
+    blessed $eng and $eng->isa( "Test::Refute::Contract" )
+        or croak( "refute_engine_push(): won't load anything but Test::Refute::Contract" );
     push @stack, $eng;
     weaken $stack[-1];
     return scalar @stack;

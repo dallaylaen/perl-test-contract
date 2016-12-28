@@ -2,9 +2,10 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.0105;
 
-use parent qw(Test::Refute::Engine);
+use Carp;
+use parent qw(Test::Refute::Contract);
 
 sub new {
     my ($class, %opt) = @_;
@@ -55,7 +56,8 @@ sub on_done {
     print $fd "1..$self->{count}\n";
 };
 
-sub DESTROY {
+sub get_tap {
+    croak "get_tap(): TAP already printed, not saved";
 };
 
 1;
