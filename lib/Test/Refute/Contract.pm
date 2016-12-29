@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.0105;
 
 =head1 NAME
 
@@ -47,7 +47,7 @@ for future analysis. See GETTERS below.
 
 =cut
 
-sub contract (&;$) {
+sub contract (&;$) { ## no critic # need block function
     my ($code, $engine) = @_;
 
     $engine ||= __PACKAGE__->new;
@@ -59,6 +59,8 @@ sub contract (&;$) {
 };
 
 =head1 METHODS
+
+The generalized object-oriented interface for C<Test::Refute> goes below.
 
 =head2 new()
 
@@ -193,7 +195,42 @@ sub error_count {
     return $self->{fails} || 0;
 };
 
+=head2 get_failed
+
+Get failed tests as hash.
+
+=cut
+
+sub get_failed {
+    my $self = shift;
+    return $self->{failed};
+};
+
+=head2 get_tap
+
+Get contract evaluation result as a multiline scalar.
+
+May NOT be available in subclasses (dies in C<Test::Refute::TAP>).
+
+=cut
+
+sub get_tap {
+    my ($self, $verbose) = @_;
+
+    $verbose = 1 unless defined $verbose;
+    $verbose++;
+    return join "\n", grep { !/^#{$verbose}/ } @{ $self->{log} }, '';
+};
+
 =head1 SUBCLASS METHODS
+
+Redefine these methods to get a custom contract behavior.
+
+=cut
+
+=head2 on_pass( $name )
+
+What to do when test passes.
 
 =cut
 
@@ -204,6 +241,12 @@ sub on_pass {
     return;
 };
 
+=head2 on_fail ( $name, $details )
+
+What to do when test fails.
+
+=cut
+
 sub on_fail {
     my ($self, $name, $cond) = @_;
 
@@ -212,16 +255,32 @@ sub on_fail {
     return;
 };
 
+=head2 diag( $message )
+
+Add a serious warning message.
+
+The interface MAY change in the future in favour of @list.
+
+=cut
+
 sub diag {
     my ($self, $mess) = @_;
 
-    # 
+    #
     croak "diag(): Testing finished"
         if $self->is_done;
     $self->_log( join " ", "#", $_ )
         for split /\n+/, $mess;
     return;
 };
+
+=head2 note( $message )
+
+Add a side note warning message.
+
+The interface MAY change in the future in favour of @list.
+
+=cut
 
 sub note {
     my ($self, $mess) = @_;
@@ -231,11 +290,25 @@ sub note {
     return;
 };
 
+=head2 on_done
+
+What to do when done_testing is called.
+
+=cut
+
 sub on_done {
     my $self = shift;
 
     $self->_log( "1..".$self->test_number );
 };
+
+=head2 bail_out( $reason )
+
+What to do when bail_out is called.
+
+The interface MAY change in the future.
+
+=cut
 
 sub bail_out {
     my ($self, $mess) = @_;
@@ -253,17 +326,5 @@ sub _log {
     push @{ $self->{log} }, $mess;
 };
 
-sub get_tap {
-    my ($self, $verbose) = @_;
-
-    $verbose = 1 unless defined $verbose;
-    $verbose++;
-    return join "\n", grep { !/^#{$verbose}/ } @{ $self->{log} }, '';
-};
-
-sub get_failed {
-    my $self = shift;
-    return $self->{failed};
-};
 
 1;
