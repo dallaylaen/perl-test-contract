@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0106;
+our $VERSION = 0.0107;
 
 =head1 NAME
 
@@ -67,7 +67,7 @@ build_refute use_ok => sub {
     $file =~ s#::#/#g;
     $file .= ".pm";
     eval { require $file; $mod->import; 1 } and return '';
-    return $@ || "Failed to load $mod";
+    return "Failed to load $mod: ".($@ || "(unknown error)");
 }, args => 1, export => 1;
 
 =head2 cpm_ok $arg, 'operation', $arg2, "explanation"
