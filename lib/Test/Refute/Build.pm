@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0107;
+our $VERSION = 0.0108;
 
 =head1 NAME
 
@@ -62,7 +62,7 @@ All functions are exportable.
 =cut
 
 use Carp;
-use Scalar::Util qw(weaken blessed);
+use Scalar::Util qw(weaken blessed set_prototype);
 use parent qw(Exporter);
 our @EXPORT = qw(build_refute refute_engine);
 our @EXPORT_OK = qw(refute_engine_push refute_engine_cleanup);
@@ -117,6 +117,7 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
         my $message; $message = pop unless @_ <= $nargs;
         return refute_engine()->refute( scalar $cond->(@_), $message );
     };
+    &set_prototype( $wrapper, '$' x $nargs . ';$' ); # & so it works on a scalar
 
     $Backend{$name}   = $target; # just for the record
     my $todo_carp_not = !$Carp_not{ $target }++;

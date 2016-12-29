@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0107;
+our $VERSION = 0.0108;
 
 =head1 NAME
 
@@ -106,31 +106,16 @@ build_refute cmp_ok => sub {
 
 B<UNLIKE> L<Test::More>, accepts string argument just fine.
 
-The argument is anchored to the WHOLE string, so that "foobar" does
-NOT match "ob", but DOES match ".*ob.*".
+If argument is plain scalar, it is anchored to match the WHOLE string,
+so that "foobar" does NOT match "ob", but DOES match ".*ob.*".
 
 =cut
 
 build_refute like => sub {
     my ($str, $reg) = @_;
 
-    $reg = qr#^(?:$reg)$#;
-    return '' if $str =~ $reg;
-    return "$str\ndoesn't match\n$reg";
-}, args => 2, export => 1;
-
-=head2 ilike $got, "regexp", "explanation"
-
-Like above, but case-insensitive.
-
-B<DEPRECATED> Not sure why this was added at all.
-
-=cut
-
-build_refute ilike => sub {
-    my ($str, $reg) = @_;
-
-    $reg = qr#^(?:$reg)$#i;
+    $reg = qr#^(?:$reg)$# unless ref $reg eq 'Regexp';
+        # retain compatibility with Test::More
     return '' if $str =~ $reg;
     return "$str\ndoesn't match\n$reg";
 }, args => 2, export => 1;

@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0105;
+our $VERSION = 0.0106;
 
 =head1 NAME
 
@@ -94,10 +94,12 @@ use Test::Refute::Build qw(refute_engine);
 use Test::Refute::Basic;
 use Test::Refute::Contract qw(contract);
 use Test::Refute::TAP;
+use Test::Refute::Deep;
 
 use parent qw(Exporter);
-my @test = qw(done_testing note diag bail_out);
-our @EXPORT = (@test, qw(contract), @Test::Refute::Basic::EXPORT );
+my @wrapper = qw(done_testing note diag bail_out);
+our @EXPORT = (@wrapper, qw(contract is_deeply explain)
+    , @Test::Refute::Basic::EXPORT );
 
 =head1 TESTS
 
@@ -110,6 +112,16 @@ Record a human-readable diagnostic message.
 =head2 note( $text )
 
 Record a human-readable sidenote.
+
+=head2 explain( $unknown_scalar )
+
+Convert scalar to human-readable form. This is really a stub for now.
+
+=cut
+
+sub explain ($) { ## no critic
+    return Test::Refute::Deep::to_scalar(shift, 3);
+};
 
 =head2 done_testing;
 
@@ -136,14 +148,15 @@ END {
     };
 };
 
-foreach (@test) {
+# Setup wrapper functions - really proxy to the current contract
+foreach (@wrapper) {
     my $name = $_;
 
-    my $code = sub (@) {
+    my $code = sub (@) { ## no critic
         refute_engine->$name(@_);
     };
 
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     *$name = $code;
 };
 

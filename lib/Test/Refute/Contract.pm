@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0105;
+our $VERSION = 0.0106;
 
 =head1 NAME
 
@@ -33,6 +33,7 @@ use Exporter qw(import);
 use Test::Refute::Build ();
 
 our @EXPORT_OK = qw(contract);
+our @CARP_NOT = qw(Test::Refute::Build Test::Refute);
 # preload most basic tests
 require Test::Refute::Basic;
 
@@ -102,6 +103,7 @@ sub refute {
     if ($deny) {
         $self->{fails}++;
         $self->on_fail( $message, $deny );
+        $self->diag( Carp::shortmess( "Failed: $message" ));
         $self->diag( $deny )
             unless looks_like_number($deny);
         return 0;

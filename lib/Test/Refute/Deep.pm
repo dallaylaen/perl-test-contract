@@ -2,7 +2,7 @@ package Test::Refute::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -118,7 +118,8 @@ Refs returned as "My::Module/1a2c3f
 
 my %replace = ( "\n" => "n", "\\" => "\\", '"' => '"', "\0" => "0", "\t" => "t" );
 sub to_scalar {
-    my ($data, $skip_deep) = @_;
+    my ($data, $depth) = @_;
+    $depth = 1 unless defined $depth;
 
     return '(undef)' unless defined $data;
     if (!ref $data) {
@@ -127,13 +128,13 @@ sub to_scalar {
         $data =~ s/([^\x20-\xFF])/sprintf "\\x%02x", ord $1/ge;
         return "\"$data\"";
     };
-    if (!$skip_deep) {
+    if ($depth) {
         if (ref $data eq 'ARRAY') {
-            return "[".join(", ", map { to_scalar($_, 1) } @$data )."]";
+            return "[".join(", ", map { to_scalar($_, $depth-1) } @$data )."]";
         };
         if (ref $data eq 'HASH') {
             return "{".join(", ", map {
-                 to_scalar($_) .":".to_scalar( $data->{$_}, 1 );
+                 to_scalar($_, 0) .":".to_scalar( $data->{$_}, $depth-1 );
             } sort keys %$data )."}";
         };
     };

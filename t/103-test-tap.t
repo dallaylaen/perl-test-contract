@@ -6,7 +6,7 @@ use warnings;
 use Test::Refute;
 use Test::Refute::TAP;
 
-sub contract_out (&;$);
+sub contract_out (&;$); ## no critic
 
 my $content;
 
@@ -37,10 +37,10 @@ $content = contract_out {
 is $content, "ok 1 - more\nnot ok 2 - no more\n1..2\n", "cmp_ok smoke";
 
 $content = contract_out {
-    like( 42, qr(\d), "unlike" );
+    like( 42, qr(\d), "like (sigh...)" );
     like( 42, qr(\d+), "like" );
 } 1;
-is $content, "not ok 1 - unlike\nok 2 - like\n1..2\n", "like smoke";
+is $content, "ok 1 - like (sigh...)\nok 2 - like\n1..2\n", "like smoke";
 
 $content = contract_out {
     like( "program", "o|g", "unlike" );
@@ -51,15 +51,9 @@ is $content
     , "not ok 1 - unlike\nnot ok 2 - unlike\nok 3 - like\n1..3\n"
     , "like smoke w/o qr()";
 
-$content = contract_out {
-    ilike( 'A', 'a', "ilike" );
-    ilike( 'AA', 'a', "not ilike" );
-} 1;
-is $content, "ok 1 - ilike\nnot ok 2 - not ilike\n1..2\n", "ilike smoke";
-
 done_testing;
 
-sub contract_out(&;$) {
+sub contract_out(&;$) { ## no critic
     my ($code, $strip) = @_;
 
     my $content = '';
