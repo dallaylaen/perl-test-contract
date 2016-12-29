@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0105;
+our $VERSION = 0.0106;
 
 =head1 NAME
 
@@ -37,7 +37,11 @@ Doesn't handle undef values yet, will be fixed soon.
 build_refute is => sub {
     my ($got, $exp) = @_;
 
-    return '' if $got eq $exp;
+    if (defined $got xor defined $exp) {
+        return "unexpected ". ((defined $got) ? "'$got'" : "undef value");
+    };
+
+    return '' if !defined $got or $got eq $exp;
     return "Got:      $got\nExpected: $exp";
 }, args => 2, export => 1;
 
