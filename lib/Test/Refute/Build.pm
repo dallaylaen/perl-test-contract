@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0106;
+our $VERSION = 0.0107;
 
 =head1 NAME
 
@@ -111,11 +111,11 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
         my $self = shift;
         my $message; $message = pop unless @_ <= $nargs;
 
-        return $self->refute( $cond->(@_), $message );
+        return $self->refute( scalar $cond->(@_), $message );
     };
     my $wrapper = sub {
         my $message; $message = pop unless @_ <= $nargs;
-        return refute_engine()->refute( $cond->(@_), $message );
+        return refute_engine()->refute( scalar $cond->(@_), $message );
     };
 
     $Backend{$name}   = $target; # just for the record
