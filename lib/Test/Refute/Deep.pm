@@ -2,7 +2,7 @@ package Test::Refute::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ use parent qw(Exporter);
 
 use Test::Refute::Build;
 
-our @export_ok = qw(deep_diff);
+our @EXPORT_OK = qw(deep_diff);
 
 =head2 is_deeply( $got, $expected )
 
@@ -39,17 +39,40 @@ Returns a true scalar if structure
 =cut
 
 sub deep_diff {
-    my ($old, $new) = @_;
+    my ($old, $new, $known, $path) = @_;
+
+    $known ||= {};
+    $path ||= '&';
 
     # diff refs => isn't right away
     if (ref $old ne ref $new) {
         return join "!=", to_scalar($old), to_scalar($new);
     };
 
+    # not deep - return right away
+    if (ref $old ne 'HASH' and ref $old ne 'ARRAY') {
+        $old = to_scalar($old);
+        $new = to_scalar($new);
+
+        return $old ne $new && "$old!=$new",
+    };
+
+    # recursion
+    # check topology first to avoid looping
+    # new is likely to be simpler (it is the "expected" one)
+    # FIXME BUG here - if new is tree, and old is DAG, this code won't catch it
+    if (my $new_path = $known->{refaddr $new}) {
+        my $old_path = $known->{-refaddr($old)};
+        return to_scalar($old)."!=$new_path" unless $old_path;
+        return $old_path ne $new_path && "$old_path!=$new_path";
+    };
+    $known->{-refaddr($old)} = $path;
+    $known->{refaddr $new} = $path;
+
     if (ref $old eq 'ARRAY') {
         my @diff;
         for (my $i = 0; $i < @$old || $i < @$new; $i++ ) {
-            my $off = deep_diff( $old->[$i], $new->[$i] );
+            my $off = deep_diff( $old->[$i], $new->[$i], $known, $path."[$i]" );
             push @diff, "$i:$off" if $off;
         };
         return @diff ? _array2str( \@diff ) : '';
@@ -60,16 +83,13 @@ sub deep_diff {
         $diff{$_} = to_scalar( $old->{$_} )."!=(none)" for @$old_k;
         $diff{$_} = "(none)!=".to_scalar( $new->{$_} ) for @$new_k;
         foreach (@$both_k) {
-            my $off = deep_diff( $old->{$_}, $new->{$_} );
+            my $off = deep_diff( $old->{$_}, $new->{$_}, $known, $path."{$_}" );
             $diff{$_} = $off if $off;
         };
         return %diff ? _hash2str( \%diff ) : '';
     };
 
-    $old = to_scalar($old);
-    $new = to_scalar($new);
-
-    return $old ne $new && "$old!=$new",
+    die "This point should never be reached, report bug immediately";
 };
 
 sub _hash2str {
