@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0106;
+our $VERSION = 0.0107;
 
 =head1 NAME
 
@@ -55,7 +55,8 @@ sub contract (&;$) { ## no critic # need block function
     $engine->start_testing;
 
     $code->();
-    $engine->done_testing;
+    $engine->done_testing
+        unless $engine->is_done;
     return $engine;
 };
 
