@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0108;
+our $VERSION = 0.0109;
 
 =head1 NAME
 
@@ -62,9 +62,9 @@ All functions are exportable.
 =cut
 
 use Carp;
-use Scalar::Util qw(weaken blessed set_prototype);
+use Scalar::Util qw(weaken blessed set_prototype looks_like_number refaddr);
 use parent qw(Exporter);
-our @EXPORT = qw(build_refute refute_engine);
+our @EXPORT = qw(build_refute refute_engine to_scalar);
 our @EXPORT_OK = qw(refute_engine_push refute_engine_cleanup);
 
 =head2 build_refute name => CODE, %options
@@ -206,5 +206,45 @@ sub refute_engine_cleanup {
     };
     return scalar @stack;
 };
+
+=head2 to_scalar ( [] || {} || "string" || undef )
+
+Convert an unknown data type to a human-readable string.
+
+Hashes/arrays are only penetrated 1 level deep.
+
+undef is returned as C<(undef)> so it can't be confused with other types.
+
+Strings are quoted unless numeric.
+
+Refs returned as "My::Module/1a2c3f
+
+=cut
+
+my %replace = ( "\n" => "n", "\\" => "\\", '"' => '"', "\0" => "0", "\t" => "t" );
+sub to_scalar {
+    my ($data, $depth) = @_;
+    $depth = 1 unless defined $depth;
+
+    return '(undef)' unless defined $data;
+    if (!ref $data) {
+        return $data if looks_like_number($data);
+        $data =~ s/([\0"\n\t\\])/\\$replace{$1}/g;
+        $data =~ s/([^\x20-\xFF])/sprintf "\\x%02x", ord $1/ge;
+        return "\"$data\"";
+    };
+    if ($depth) {
+        if (ref $data eq 'ARRAY') {
+            return "[".join(", ", map { to_scalar($_, $depth-1) } @$data )."]";
+        };
+        if (ref $data eq 'HASH') {
+            return "{".join(", ", map {
+                 to_scalar($_, 0) .":".to_scalar( $data->{$_}, $depth-1 );
+            } sort keys %$data )."}";
+        };
+    };
+    return sprintf "%s/%x", ref $data, refaddr $data;
+};
+
 
 1;

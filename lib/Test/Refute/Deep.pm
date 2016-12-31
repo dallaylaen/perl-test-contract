@@ -2,7 +2,7 @@ package Test::Refute::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.0104;
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Add C<is_deeply> method to L<Test::Refute> and L<Test::Refute::Contract>.
 
 =cut
 
-use Scalar::Util qw(blessed refaddr looks_like_number);
+use Scalar::Util qw(refaddr);
 use parent qw(Exporter);
 
 use Test::Refute::Build;
@@ -100,45 +100,6 @@ sub _hash2str {
 sub _array2str {
     my $array = shift;
     return "[".join(", ", @$array)."]";
-};
-
-=head2 to_scalar ( [] || {} || "string" || undef )
-
-Convert an unknown data type to a human-readable string.
-
-Hashes/arrays are only penetrated 1 level deep.
-
-undef is returned as C<(undef)> so it can't be confused with other types.
-
-Strings are quoted unless numeric.
-
-Refs returned as "My::Module/1a2c3f
-
-=cut
-
-my %replace = ( "\n" => "n", "\\" => "\\", '"' => '"', "\0" => "0", "\t" => "t" );
-sub to_scalar {
-    my ($data, $depth) = @_;
-    $depth = 1 unless defined $depth;
-
-    return '(undef)' unless defined $data;
-    if (!ref $data) {
-        return $data if looks_like_number($data);
-        $data =~ s/([\0"\n\t\\])/\\$replace{$1}/g;
-        $data =~ s/([^\x20-\xFF])/sprintf "\\x%02x", ord $1/ge;
-        return "\"$data\"";
-    };
-    if ($depth) {
-        if (ref $data eq 'ARRAY') {
-            return "[".join(", ", map { to_scalar($_, $depth-1) } @$data )."]";
-        };
-        if (ref $data eq 'HASH') {
-            return "{".join(", ", map {
-                 to_scalar($_, 0) .":".to_scalar( $data->{$_}, $depth-1 );
-            } sort keys %$data )."}";
-        };
-    };
-    return sprintf "%s/%x", ref $data, refaddr $data;
 };
 
 # in: hash + hash

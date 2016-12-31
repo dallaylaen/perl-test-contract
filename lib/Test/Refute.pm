@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0107;
+our $VERSION = 0.0108;
 
 =head1 NAME
 
@@ -158,7 +158,7 @@ Convert scalar to human-readable form. This is really a stub for now.
 =cut
 
 sub explain ($) { ## no critic
-    return Test::Refute::Deep::to_scalar(shift, 3);
+    return to_scalar(shift, 3);
 };
 
 =head2 done_testing;
