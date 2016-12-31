@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0106;
+our $VERSION = 0.0107;
 
 =head1 NAME
 
@@ -98,12 +98,50 @@ use Test::Refute::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out);
-our @EXPORT = (@wrapper, qw(contract is_deeply explain)
-    , @Test::Refute::Basic::EXPORT );
+our @EXPORT = (@wrapper, @Test::Refute::Basic::EXPORT
+    , qw(contract is_deeply explain plan)
+    );
+
+# FIXME Have to make ugly hacks for Test::More compatibility
+sub import {
+    my ($self, $t, $n, @rest) = @_;
+    if ($t and $t eq 'tests') {
+        plan( tests => $n );
+        @_ = ($self, @rest);
+    };
+    goto &Exporter::import; ## no critic
+};
 
 =head1 TESTS
 
 See L<Test::Refute::Basic> for checks allowed by default.
+
+=head2 plan tests => nnn
+
+Declare test plan (see Test::More).
+
+done_testing() is still required, and plan will still be output at the end.
+
+Generates 1 extra failed test if plan was declared and not fulfilled.
+
+=head2 plan skip_all => $reason
+
+Skip all tests.
+
+=cut
+
+sub plan($$) { ## no critic
+    my ($todo, $arg) = @_;
+
+    if ($todo eq 'tests') {
+        $todo = 'plan';
+    }
+    elsif( $todo ne 'skip_all' ) {
+        croak( "plan(): only (tests => nnn) or (skip_all => reason) args supported" );
+    };
+
+    refute_engine->$todo( $arg );
+};
 
 =head2 diag( $text )
 
@@ -139,12 +177,19 @@ $main_engine->start_testing;
 
 END {
     if ($main_engine->test_number) {
-        $main_engine->is_done
-             or croak "done_testing was not seen";
+        croak "done_testing was not seen"
+            unless $main_engine->get_plan;
+
+        $main_engine->done_testing
+            unless $main_engine->is_done;
 
         my $ret = $main_engine->error_count;
         $ret = 100 if $ret > 100;
         $? = $ret;
+    }
+    elsif ($main_engine->is_skipped) {
+        $main_engine->done_testing
+            unless $main_engine->is_done;
     };
 };
 

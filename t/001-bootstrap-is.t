@@ -6,6 +6,18 @@ use warnings;
 # We must load Basic.pm first, before all else
 # so that cover -t doesn't lie about coverage
 
+BEGIN {
+    eval {
+        require parent;
+        require Carp;
+        require Exporter;
+        require Scalar::Util;
+    } or do {
+        print "Bail out! $@";
+        exit 1;
+    };
+};
+
 use Test::Refute::Build;
 use Test::Refute::Basic;
 

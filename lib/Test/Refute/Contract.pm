@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0107;
+our $VERSION = 0.0108;
 
 =head1 NAME
 
@@ -98,6 +98,9 @@ sub refute {
     croak "Already done testing"
         if $self->{done};
 
+    return $deny ? 0 : $self->{count}
+        if $self->{skip_all};
+
     $self->{count}++;
     $message ||= "test $self->{count}";
 
@@ -130,6 +133,36 @@ sub start_testing {
     return $self;
 };
 
+=head2 plan( $n )
+
+Commit to performing exactly n tests. This would die if testing had started.
+
+=cut
+
+sub plan {
+    my ($self, $n) = @_;
+
+    croak "plan(): argument must be numeric"
+        unless $n =~ /^\d+$/;
+    croak "plan(): testing already started"
+        if $self->test_number;
+
+    $self->{plan} = $n;
+    return $self;
+};
+
+=head2 skip_all( "reason" )
+
+reason must be true, or this won't work!
+
+=cut
+
+sub skip_all {
+    my ($self, $reason) = @_;
+    return if $self->is_done;
+    $self->{skip_all} ||= $reason || 'unknown reason';
+};
+
 =head2 done_testing
 
 Finalize test engine and remove it from the stack.
@@ -139,9 +172,18 @@ Finalize test engine and remove it from the stack.
 sub done_testing {
     my $self = shift;
 
-    $self->{done}++ and croak "done_testing() called twice";
-    Test::Refute::Build::refute_engine_cleanup();
+    $self->{done} and croak "done_testing() called twice";
 
+    if ($self->{plan} and !$self->{skip_all} and $self->{plan} != $self->test_number) {
+        $self->refute(
+            sprintf( "made %d/%d tests", $self->test_number, $self->{plan} )
+            , "plan failed!"
+        )
+    };
+
+    # engine cleanup MUST be called with true done flag.
+    $self->{done}++;
+    Test::Refute::Build::refute_engine_cleanup();
     $self->on_done;
 
     return $self;
@@ -163,6 +205,29 @@ sub is_done {
     my $self = shift;
 
     return $self->{done};
+};
+
+=head2 get_plan
+
+Returns number of planned tests, if given, or number of tests done if done.
+
+B<EXPERIMENTAL> Logic is not obvious.
+
+=cut
+
+sub get_plan {
+    my $self = shift;
+
+    return $self->{plan} || ($self->is_done && $self->test_number);
+};
+
+=head2 is_skipped
+
+=cut
+
+sub is_skipped {
+    my $self = shift;
+    return $self->{skip_all} || '';
 };
 
 =head2 test_number
@@ -302,7 +367,8 @@ What to do when done_testing is called.
 sub on_done {
     my $self = shift;
 
-    $self->_log( "1..".$self->test_number );
+    my $comment = $self->{skip_all} ? (' # SKIP '.$self->{skip_all} ) : '';
+    $self->_log( "1.." .$self->test_number . $comment );
 };
 
 =head2 bail_out( $reason )
@@ -316,9 +382,10 @@ The interface MAY change in the future.
 sub bail_out {
     my ($self, $mess) = @_;
 
-    $self->{skip}++;
-    $self->{failed}{ $self->test_number } = [ "Bail out", $mess ];
+    $mess ||= '';
+    $self->refute( "Bail out", $mess );
     $self->_log( "Bail out! $mess" );
+    $self->{skip_all} = "Bail out! $mess";
     return;
 };
 
