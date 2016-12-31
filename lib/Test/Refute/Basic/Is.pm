@@ -2,7 +2,7 @@ package Test::Refute::Basic::Is;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -32,11 +32,12 @@ build_refute is => sub {
     my ($got, $exp) = @_;
 
     if (defined $got xor defined $exp) {
-        return "unexpected ". ((defined $got) ? "'$got'" : "undef value");
+        return "unexpected ". to_scalar($got, 0);
     };
 
     return '' if !defined $got or $got eq $exp;
-    return "Got:      $got\nExpected: $exp";
+    return sprintf "Got:      %s\nExpected: %s"
+        , to_scalar($got, 0), to_scalar($exp, 0);
 }, args => 2, export => 1;
 
 # Experimental still
