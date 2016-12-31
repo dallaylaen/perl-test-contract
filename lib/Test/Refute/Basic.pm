@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0108;
+our $VERSION = 0.0109;
 
 =head1 NAME
 
@@ -10,10 +10,14 @@ Test::Refute::Basic - a set of most common tests for Test::Refute suite
 
 =head1 DESCRIPTION
 
+B<DO NOT USE THIS MODULE DIRECTLY>.
+Instead, load L<Test::Refute> for functional interface,
+or L<Test::Refute::Contract> for object-oriented one.
+Both would preload this module.
+
 This module contains most common test conditions similar to those in
 L<Test::More>, like C<is $got, $expected;> or C<like $got, qr/.../>.
-It is automatically loaded by both L<Test::Refute>
-and L<Test::Refute::Contract>, so you probably needn't to load it directly.
+Please refer here for an up-to-date reference.
 
 =head1 FUNCTIONS
 
@@ -27,23 +31,16 @@ the same signature is generated for each of them (see L<Test::Refute::Build>).
 use Carp;
 use parent qw(Exporter);
 use Test::Refute::Build qw(build_refute refute_engine);
+use Test::Refute::Basic::Is;
+our @EXPORT = @Test::Refute::Basic::Is::EXPORT;
 
 =head2 is $got, $expected, "explanation"
 
-Doesn't handle undef values yet, will be fixed soon.
+Check for equality, undef equals undef and nothing else.
 
 =cut
 
-build_refute is => sub {
-    my ($got, $exp) = @_;
-
-    if (defined $got xor defined $exp) {
-        return "unexpected ". ((defined $got) ? "'$got'" : "undef value");
-    };
-
-    return '' if !defined $got or $got eq $exp;
-    return "Got:      $got\nExpected: $exp";
-}, args => 2, export => 1;
+# See Test::Refute::Basic::Is for implementation
 
 =head2 ok $condition, "explanation"
 
@@ -119,5 +116,14 @@ build_refute like => sub {
     return '' if $str =~ $reg;
     return "$str\ndoesn't match\n$reg";
 }, args => 2, export => 1;
+
+=head2 contract_is Test::Refute::Contract, "11000101", "explanation"
+
+Check that tests denoted by 1 pass, and those denoted by 0 fail.
+An verbose summary is diag'ed in case of failure.
+
+=cut
+
+# See Test::Refute::Basic::Is for implementation
 
 1;

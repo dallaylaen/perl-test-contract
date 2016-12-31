@@ -1,0 +1,8 @@
+0xx - bootstrapping the core: is, contract_is, Test::Refute::Contract::TAP
+    SHOULD bail_out on failure
+1xx - the core functionality: basic conditions, contract getters.
+2xx - Test::More compatibility: plan, extra TAP tests etc
+3xx - anything else
+
+Test::Refute::Basic::Is and Test::Refute::Contract::TAP
+    SHOULD have 100% coverage.

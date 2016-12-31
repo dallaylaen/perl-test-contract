@@ -3,26 +3,26 @@
 use strict;
 use warnings;
 
-# We must load Basic.pm first, before all else
-# so that cover -t doesn't lie about coverage
-
 BEGIN {
     eval {
         require parent;
         require Carp;
         require Exporter;
         require Scalar::Util;
+        require Test::Refute::Build;
+        require Test::Refute::Basic::Is;
+        Test::Refute::Basic::Is->import;
+        1;
     } or do {
         print "Bail out! $@";
         exit 1;
     };
 };
 
-use Test::Refute::Build;
-use Test::Refute::Basic;
-
 Test::Refute::Contract->can("import")
     and print "Bail out! Contract loaded by accident, redo bootstrapping\n";
+Test::Refute::Basic->can("import")
+    and print "Bail out! Basic loaded by accident, redo bootstrapping\n";
 
 my @warn;
 $SIG{__WARN__} = sub {
