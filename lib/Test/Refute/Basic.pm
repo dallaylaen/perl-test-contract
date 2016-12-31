@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0109;
+our $VERSION = 0.0110;
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ the same signature is generated for each of them (see L<Test::Refute::Build>).
 
 use Carp;
 use parent qw(Exporter);
-use Test::Refute::Build qw(build_refute refute_engine);
+use Test::Refute::Build;
 use Test::Refute::Basic::Is;
 our @EXPORT = @Test::Refute::Basic::Is::EXPORT;
 
@@ -41,6 +41,19 @@ Check for equality, undef equals undef and nothing else.
 =cut
 
 # See Test::Refute::Basic::Is for implementation
+
+=head2 is $got, $expected, "explanation"
+
+The reverse of is().
+
+=cut
+
+build_refute isnt => sub {
+    my ($got, $exp) = @_;
+    return if defined $got xor defined $exp;
+    return "Unexpected: ".to_scalar($got)
+        if !defined $got or $got eq $exp;
+}, args => 2, export => 1;
 
 =head2 ok $condition, "explanation"
 
