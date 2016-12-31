@@ -2,7 +2,7 @@ package Test::Refute::Basic::Is;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 =head1 NAME
 
@@ -50,7 +50,7 @@ build_refute contract_is => sub {
     return '' if $condition eq join "", @out;
 
     # analyse what went wrong
-    my @cond = split /.*?/, $condition;
+    my @cond = split / *?/, $condition;
     my @fail;
     push @fail, "Contract signature: @out";
     push @fail, "Expected:           @cond";
@@ -58,8 +58,11 @@ build_refute contract_is => sub {
         if @out != @cond;
     for (my $i = 0; $i<@out && $i<@cond; $i++) {
         next if $out[$i] eq $cond[$i];
-        push @fail, "Unexpected "
-            .($not_ok->{$i} ? "not ok $i: $not_ok->{$i}" : "ok $i");
+        my $n = $i + 1;
+        push @fail, "Unexpected " .($not_ok->{$n} ? "not ok $n" : "ok $n");
+        if ($not_ok->{$n}) {
+            push @fail, map { "DIAG # $_" } split /\n+/, $not_ok->{$n}[1]
+        };
     };
     return join "\n", @fail;
 }, args => 2, export => 1;

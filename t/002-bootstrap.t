@@ -2,11 +2,13 @@
 
 use strict;
 use warnings;
+use Carp;
 
 $| = 1;
 # don't use Test::More or Test::Refute
 
 sub fork_is (&$$); ## no critic
+$SIG{__DIE__} = \&Carp::confess;
 
 fork_is {
     require Test::Refute;
@@ -29,6 +31,41 @@ fork_is {
 not ok 1 - Foo
 Bail out! Foo
 1..1
+IS
+
+fork_is {
+    require Test::Refute;
+    Test::Refute->import;
+
+    my $c = contract( sub {
+        is (42, 42);
+        is (42, 137);
+        is (42, 137);
+        is (42, 42);
+    });
+
+    is (ref $c, 'Test::Refute::Contract', "REQ");
+    is ($c->test_number, 4, "REQ");
+    is ($c->error_count, 2, "REQ");
+    ok ($c->is_done, "REQ");
+
+    # Now test contract fail modes
+    contract_is( $c, 1001, "OK" );
+    contract_is( $c, 1, "NOK" );
+    contract_is( $c, 1111, "NOK" );
+    contract_is( $c, "0000", "NOK" );
+
+    done_testing();
+} 3, <<IS;
+ok 1 - REQ
+ok 2 - REQ
+ok 3 - REQ
+ok 4 - REQ
+ok 5 - OK
+not ok 6 - NOK
+not ok 7 - NOK
+not ok 8 - NOK
+1..8
 IS
 
 my $n_test;
@@ -83,7 +120,6 @@ sub fork_is (&$$) { ## no critic
 
     print "# RAW $_\n" for split "\n", $got;
     $got = str_cleanup( "~~~ $value\n$got" );
-    print "# GOT $_\n" for split "\n", $got;
 
     $n_test++;
     if ($got eq $exp) {
@@ -91,6 +127,7 @@ sub fork_is (&$$) { ## no critic
         print "ok $n_test\n";
     } else {
         print "not ok $n_test\n";
+        print "# GOT $_\n" for split "\n", $got;
         print "# EXP $_\n" for split /\n/, $exp;
     };
 };
