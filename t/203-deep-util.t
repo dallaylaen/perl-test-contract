@@ -15,8 +15,12 @@ is to_scalar("foo bar"), '"foo bar"', "to_scalar string";
 is to_scalar("\t\0\n\"\\"), '"\\t\\0\\n\\"\\\\"', "to_scalar escape";
 
 like to_scalar( Test::Refute::Contract->new )
-    , "Test::Refute::Contract/[0-9a-f]+"
+    , "Test::Refute::Contract\\{.*\\}"
     , "to_scalar blessed";
+
+like to_scalar( Test::Refute::Contract->new, 0 )
+    , "Test::Refute::Contract/[a-f0-9]+"
+    , "to_scalar blessed shallow";
 
 is to_scalar( [] ), "[]", "to_scalar empty array";
 is to_scalar( {} ), "{}", "to_scalar empty hash";

@@ -31,4 +31,12 @@ push @$deep7, [[[[[[ $deep7 ]]]]]];
 note deep_diff( $deep5, $deep7 );
 is deep_diff( $deep5, $deep5 ), '', "compare self => ok (doesn't hang)";
 
+my $x = bless { foo=>42 }, 'Bar';
+my $y = bless { foo=>42 }, 'Bar';
+isnt( $x, $y, "Not the same");
+is deep_diff( $x, $y ), '', "But structure *is* same";
+
+is deep_diff( $x, bless { foo => 137 }, 'Bar' )
+    , 'Bar{"foo":42!=137}', "Deep diff in blessed var";
+
 done_testing;

@@ -2,7 +2,7 @@ package Test::Refute::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.0105;
 
 =head1 NAME
 
@@ -44,17 +44,16 @@ sub deep_diff {
     $known ||= {};
     $path ||= '&';
 
+    # TODO combine conditions, too much branching
     # diff refs => isn't right away
-    if (ref $old ne ref $new) {
+    if (ref $old ne ref $new or (defined $old xor defined $new)) {
         return join "!=", to_scalar($old), to_scalar($new);
     };
 
     # not deep - return right away
-    if (ref $old ne 'HASH' and ref $old ne 'ARRAY') {
-        $old = to_scalar($old);
-        $new = to_scalar($new);
-
-        return $old ne $new && "$old!=$new",
+    return '' unless defined $old;
+    if (!ref $old) {
+        return $old ne $new && join "!=", to_scalar($old), to_scalar($new),
     };
 
     # recursion
@@ -69,15 +68,15 @@ sub deep_diff {
     $known->{-refaddr($old)} = $path;
     $known->{refaddr $new} = $path;
 
-    if (ref $old eq 'ARRAY') {
+    if (UNIVERSAL::isa( $old , 'ARRAY') ) {
         my @diff;
         for (my $i = 0; $i < @$old || $i < @$new; $i++ ) {
             my $off = deep_diff( $old->[$i], $new->[$i], $known, $path."[$i]" );
             push @diff, "$i:$off" if $off;
         };
-        return @diff ? _array2str( \@diff ) : '';
+        return @diff ? _array2str( \@diff, ref $old ) : '';
     };
-    if (ref $old eq 'HASH') {
+    if (UNIVERSAL::isa( $old, 'HASH') ) {
         my ($both_k, $old_k, $new_k) = _both_keys( $old, $new );
         my %diff;
         $diff{$_} = to_scalar( $old->{$_} )."!=(none)" for @$old_k;
@@ -86,20 +85,27 @@ sub deep_diff {
             my $off = deep_diff( $old->{$_}, $new->{$_}, $known, $path."{$_}" );
             $diff{$_} = $off if $off;
         };
-        return %diff ? _hash2str( \%diff ) : '';
+        return %diff ? _hash2str( \%diff, ref $old ) : '';
     };
 
-    die "This point should never be reached, report bug immediately";
+    # finally - don't know what to do, compare refs
+    $old = to_scalar($old);
+    $new = to_scalar($new);
+    return $old ne $new && join "!=", $old, $new;
 };
 
 sub _hash2str {
-    my $hash = shift;
-    return "{".join(", ", map { to_scalar($_).":$hash->{$_}" } sort keys %$hash)."}";
+    my ($hash, $type) = @_;
+    $type = '' if $type eq 'HASH';
+    return $type.'{'
+            . join(", ", map { to_scalar($_).":$hash->{$_}" } sort keys %$hash)
+        ."}";
 };
 
 sub _array2str {
-    my $array = shift;
-    return "[".join(", ", @$array)."]";
+    my ($array, $type) = @_;
+    $type = '' if $type eq 'ARRAY';
+    return "$type\[".join(", ", @$array)."]";
 };
 
 # in: hash + hash

@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0109;
+our $VERSION = 0.0110;
 
 =head1 NAME
 
@@ -234,11 +234,13 @@ sub to_scalar {
         return "\"$data\"";
     };
     if ($depth) {
-        if (ref $data eq 'ARRAY') {
-            return "[".join(", ", map { to_scalar($_, $depth-1) } @$data )."]";
+        if (UNIVERSAL::isa($data, 'ARRAY')) {
+            return (ref $data eq 'ARRAY' ? '' : ref $data)
+                ."[".join(", ", map { to_scalar($_, $depth-1) } @$data )."]";
         };
-        if (ref $data eq 'HASH') {
-            return "{".join(", ", map {
+        if (UNIVERSAL::isa($data, 'HASH')) {
+            return (ref $data eq 'HASH' ? '' : ref $data)
+            . "{".join(", ", map {
                  to_scalar($_, 0) .":".to_scalar( $data->{$_}, $depth-1 );
             } sort keys %$data )."}";
         };
