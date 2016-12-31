@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0108;
+our $VERSION = 0.0109;
 
 =head1 NAME
 
@@ -90,7 +90,7 @@ All functions in this module are exported by default.
 
 use Carp;
 
-use Test::Refute::Build qw(refute_engine);
+use Test::Refute::Build;
 use Test::Refute::Basic;
 use Test::Refute::Contract qw(contract);
 use Test::Refute::TAP;

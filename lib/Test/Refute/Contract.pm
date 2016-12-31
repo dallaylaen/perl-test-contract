@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0108;
+our $VERSION = 0.0109;
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 use Exporter qw(import);
 
-use Test::Refute::Build ();
+use Test::Refute::Build qw(to_scalar);
 
 our @EXPORT_OK = qw(contract);
 our @CARP_NOT = qw(Test::Refute::Build Test::Refute);
@@ -332,13 +332,14 @@ The interface MAY change in the future in favour of @list.
 =cut
 
 sub diag {
-    my ($self, $mess) = @_;
+    my ($self, @mess) = @_;
 
     #
     croak "diag(): Testing finished"
         if $self->is_done;
     $self->_log( join " ", "#", $_ )
-        for split /\n+/, $mess;
+        for split /\n+/, join "",
+            map { defined $_ && !ref $_ ? $_ : to_scalar($_); } @mess;
     return;
 };
 
@@ -351,10 +352,11 @@ The interface MAY change in the future in favour of @list.
 =cut
 
 sub note {
-    my ($self, $mess) = @_;
+    my ($self, @mess) = @_;
 
     $self->_log( join " ", "##", $_ )
-        for split /\n+/, $mess;
+        for split /\n+/, join "",
+            map { defined $_ && !ref $_ ? $_ : to_scalar($_); } @mess;
     return;
 };
 
