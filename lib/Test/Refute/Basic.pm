@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0110;
+our $VERSION = 0.0111;
 
 =head1 NAME
 
@@ -119,16 +119,44 @@ B<UNLIKE> L<Test::More>, accepts string argument just fine.
 If argument is plain scalar, it is anchored to match the WHOLE string,
 so that "foobar" does NOT match "ob", but DOES match ".*ob.*".
 
+=head2 unlike $got, "regexp", "explanation"
+
+The exact reverse of the above.
+
+B<UNLIKE> L<Test::More>, accepts string argument just fine.
+
+If argument is plain scalar, it is anchored to match the WHOLE string,
+so that "foobar" does NOT match "ob", but DOES match ".*ob.*".
+
 =cut
 
 build_refute like => sub {
-    my ($str, $reg) = @_;
+    _like_unlike( $_[0], $_[1], 0 );
+}, args => 2, export => 1;
+
+build_refute unlike => sub {
+    _like_unlike( $_[0], $_[1], 1 );
+}, args => 2, export => 1;
+
+sub _like_unlike {
+    my ($str, $reg, $reverse) = @_;
 
     $reg = qr#^(?:$reg)$# unless ref $reg eq 'Regexp';
         # retain compatibility with Test::More
-    return '' if $str =~ $reg;
-    return "$str\ndoesn't match\n$reg";
-}, args => 2, export => 1;
+    return '' if $str =~ $reg xor $reverse;
+    return "$str\n".($reverse ? "unexpectedly matches" : "doesn't match")."\n$reg";
+};
+
+=head2 can_ok
+
+=cut
+
+build_refute can_ok => sub {
+    my $class = shift;
+
+    my @missing = grep { !$class->can($_) } @_;
+    return @missing && to_scalar($class, 0)." has no methods ".join ", ", @missing;
+}, no_pop => 1, export =>1;
 
 =head2 contract_is Test::Refute::Contract, "11000101", "explanation"
 

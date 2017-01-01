@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0110;
+our $VERSION = 0.0111;
 
 =head1 NAME
 
@@ -106,6 +106,7 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
     my $target = $opt{target} || caller;
 
     my $nargs = $opt{args} || 0;
+    $nargs = 9**9**9 if $opt{no_pop};
 
     my $method  = sub {
         my $self = shift;
@@ -117,7 +118,9 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
         my $message; $message = pop unless @_ <= $nargs;
         return refute_engine()->refute( scalar $cond->(@_), $message );
     };
-    &set_prototype( $wrapper, '$' x $nargs . ';$' ); # & so it works on a scalar
+    # '&' for set_proto to work on a scalar, not {CODE;}
+    &set_prototype( $wrapper, '$' x $opt{args} . ';$' )
+        if $opt{args};
 
     $Backend{$name}   = $target; # just for the record
     my $todo_carp_not = !$Carp_not{ $target }++;
