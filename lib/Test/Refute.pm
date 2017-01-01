@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0114;
+our $VERSION = 0.0115;
 
 =head1 NAME
 
@@ -98,11 +98,12 @@ use Test::Refute::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest);
-my @own = qw(BAIL_OUT explain plan);
+my @own = qw(BAIL_OUT explain plan skip $TODO);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
 my $main_engine;
 my $no_plan_seen;
+our $TODO; # unimplemented - use contract instead!
 
 # FIXME Have to make ugly hacks for Test::More compatibility
 
@@ -194,6 +195,18 @@ can be executed after this call.
 Stop testing here, interrupting all further testing.
 
 =cut
+
+=head2 skip( ... )
+
+Here for compatibility with Test::More.
+
+It only warns when called, doesn't skip anything.
+
+=cut
+
+sub skip(@) { ## no critic
+    carp "skip(): UNIMPLEMENTED. Use simple if() instead.";
+};
 
 END {
     if ($main_engine and $main_engine->test_number) {
