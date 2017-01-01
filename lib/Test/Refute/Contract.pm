@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0109;
+our $VERSION = 0.0110;
 
 =head1 NAME
 
@@ -74,7 +74,33 @@ This MAY change in the future.
 sub new {
     my ($class, %opt) = @_;
 
-    return bless {}, $class;
+    return bless {
+        indent => $opt{indent} || 0,
+    }, $class;
+};
+
+=head2 subcontract( %options )
+
+Create a fresh copy of current contract.
+
+Indent it by 1 unless $option{indent} given.
+
+=cut
+
+sub subcontract {
+    my ($self, %opt) = @_;
+
+    my $class = delete $opt{class} || ref $self;
+
+    exists $opt{$_} or $opt{$_} = $self->{$_}
+        for $self->_NEWOPTIONS;
+    $opt{indent} = $self->get_indent + 1
+        unless exists $opt{indent};
+    return $class->new( %opt );
+};
+
+sub _NEWOPTIONS {
+    return ();
 };
 
 =head2 refute( $condition, $name )
@@ -161,6 +187,21 @@ sub skip_all {
     my ($self, $reason) = @_;
     return if $self->is_done;
     $self->{skip_all} ||= $reason || 'unknown reason';
+};
+
+=head2 subtest
+
+=cut
+
+sub subtest {
+    my ($self, $name, $code) = @_;
+
+    ref $code eq 'CODE'
+        or croak ("subtest(): second argument must be CODE!");
+
+    my $subc = $self->subcontract;
+    &contract( $code, $subc );
+    $self->refute( $subc->error_count, $name);
 };
 
 =head2 done_testing
@@ -288,6 +329,20 @@ sub get_tap {
     $verbose = 1 unless defined $verbose;
     $verbose++;
     return join "\n", grep { !/^#{$verbose}/ } @{ $self->{log} }, '';
+};
+
+=head2 get_indent
+
+Get the indentation level of the current contract.
+
+Indentation increases with each subtest.
+
+=cut
+
+sub get_indent {
+    my $self = shift;
+
+    return $self->{indent};
 };
 
 =head1 SUBCLASS METHODS

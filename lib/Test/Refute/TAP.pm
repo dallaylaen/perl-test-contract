@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0110;
+our $VERSION = 0.0111;
 
 =head1 NAME
 
@@ -32,6 +32,8 @@ use parent qw(Test::Refute::Contract);
 
 =item * out - file handle to print TAP to. Default is of course STDOUT.
 
+=item * indent - indent output (useful for subtests).
+
 =back
 
 =cut
@@ -44,10 +46,16 @@ sub new {
     open (my $dup, ">&", $fd)
         or die "redirect failed: $!";
 
-    $opt{out} = $fd;
-    $opt{count} = 0;
+    $opt{out}     = $fd;
+    $opt{count}   = 0;
+    $opt{indent}  = ' ' x (($opt{indent}||0) * 4);
 
     return bless \%opt, $class;
+};
+
+sub _NEWOPTIONS {
+    my $self = shift;
+    return $self->SUPER::_NEWOPTIONS, qw(out);
 };
 
 sub _log {
@@ -55,19 +63,41 @@ sub _log {
 
     $mess =~ s#\n+$##s;
     my $fd = $self->{out};
-    print $fd "$mess\n";
+    print $fd "$self->{indent}$mess\n";
+};
+
+=head2 get_indent
+
+=cut
+
+sub get_indent {
+    my $self = shift;
+    return (length $self->{indent}) / 4;
 };
 
 =head2 get_tap
 
 Since the TAP output is printed, it's not saved in the object.
 
-So trying to get it back would result in exception...
+However, it may be reconstructed to some extent...
 
 =cut
 
 sub get_tap {
-    croak "get_tap(): TAP already printed, not saved";
+    my $self = shift;
+
+    my @result = ("1..".$self->test_number);
+
+    my $fails = $self->get_failed;
+
+    foreach my $n (1 .. $self->test_number) {
+        my $f = $fails->{$_};
+        push @result, $f
+            ? ("not ok $n - $f->[0]", map { "# $_" } split "\n", $f->[1])
+            : "ok $n";
+    };
+
+    return join "\n", @result, '';
 };
 
 1;

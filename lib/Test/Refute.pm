@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0109;
+our $VERSION = 0.0110;
 
 =head1 NAME
 
@@ -97,7 +97,7 @@ use Test::Refute::TAP;
 use Test::Refute::Deep;
 
 use parent qw(Exporter);
-my @wrapper = qw(done_testing note diag bail_out);
+my @wrapper = qw(done_testing note diag bail_out subtest);
 our @EXPORT = (@wrapper, @Test::Refute::Basic::EXPORT
     , qw(contract is_deeply explain plan)
     );
@@ -160,6 +160,10 @@ Convert scalar to human-readable form. This is really a stub for now.
 sub explain ($) { ## no critic
     return to_scalar(shift, 3);
 };
+
+=head2 subtest "name" => CODE;
+
+Create an indented sub-test.
 
 =head2 done_testing;
 
