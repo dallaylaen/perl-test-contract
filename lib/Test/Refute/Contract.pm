@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0110;
+our $VERSION = 0.0111;
 
 =head1 NAME
 
@@ -228,6 +228,46 @@ sub done_testing {
     $self->on_done;
 
     return $self;
+};
+
+=head2 sign( expectation, comment)
+
+Check that the contract is fulfilled to exactly the given extent,
+AND record that test with the current GLOBAL contract engine
+(likely NOT the calling object itself).
+
+I<Somewhat twisted logic here...>
+
+Expectations are currently supported in the only format:
+a string of 0's and 1's.
+More formats MAY follow in the future.
+
+See contract_is() in L<Test::Refute::Basic>.
+
+Usage is like this:
+
+    use strict;
+    use warnings;
+    use Test::Refute;
+
+    # ...
+    contract {
+        ok 1;
+        ok 1;
+        ok 0;
+        ok 1;
+    }->sign( "1101" );
+    done_testing;
+
+Returns self so that other methods MAY be chained.
+
+B<EXPERIMENTAL> Name and meaning MAY change in the future.
+
+=cut
+
+sub sign {
+    Test::Refute::Build::refute_engine()->contract_is( @_ );
+    return shift;
 };
 
 sub DESTROY {
