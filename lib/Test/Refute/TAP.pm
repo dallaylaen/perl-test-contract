@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0109;
+our $VERSION = 0.0110;
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ use parent qw(Test::Refute::Contract);
 
 =over
 
-=item * fd - file handle to print TAP to. Default is of course STDOUT.
+=item * out - file handle to print TAP to. Default is of course STDOUT.
 
 =back
 
@@ -40,7 +40,7 @@ sub new {
     my ($class, %opt) = @_;
 
     # dup2 STDOUT so that we aren't botched by furthe redirect
-    my $fd = delete $opt{fd} || \*STDOUT;
+    my $fd = delete $opt{out} || \*STDOUT;
     open (my $dup, ">&", $fd)
         or die "redirect failed: $!";
 

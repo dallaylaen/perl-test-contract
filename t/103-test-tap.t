@@ -60,7 +60,7 @@ sub contract_out(&;$) { ## no critic
     open my $fd, ">", \$content
         or die "Failed to redirect: $!";
 
-    &contract( $code, Test::Refute::TAP->new( fd => $fd ) );
+    &contract( $code, Test::Refute::TAP->new( out => $fd ) );
     $content =~ s/#.*?\n//gs
         if $strip;
     return $content;
