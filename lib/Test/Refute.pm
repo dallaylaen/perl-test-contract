@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0115;
+our $VERSION = 0.0116;
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ use Test::Refute::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest);
-my @own = qw(BAIL_OUT explain plan skip $TODO);
+my @own = qw(BAIL_OUT explain plan skip $TODO pass fail);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
 my $main_engine;
@@ -182,6 +182,27 @@ sub explain ($) { ## no critic
 =head2 subtest "name" => CODE;
 
 Create an indented sub-test.
+
+=head2 pass $message
+
+=head2 fail $message
+
+Would log an (un)successful test.
+
+B<DEPRECATED>. If you want to build custom test, use refute() primitive instead.
+This is mainly here for compatibility, and issues a warning.
+
+=cut
+
+sub pass($) { ## no critic
+    carp "pass(): DEPRECATED. Build your own tests using the refute() primitive.";
+    ok (1, @_);
+};
+
+sub fail($) { ## no critic
+    carp "fail(): DEPRECATED. Build your own tests using the refute() primitive.";
+    ok (0, @_);
+};
 
 =head2 done_testing;
 
