@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0111;
+our $VERSION = 0.0112;
 
 =head1 NAME
 
@@ -45,6 +45,34 @@ require Test::Refute::Basic;
 
 Run a series of tests against a contract object, recording the output
 for future analysis. See GETTERS below.
+This is like C<subtest>, but way more powerful.
+
+Said contract object is passed to CODE reference as first argument,
+so that one can run assertions is production code without polluting
+the global namespace.
+
+These two are equivalent:
+
+    use Test::Refute;
+
+    my $contract = contract {
+        is $foo, $baf, "foobar";
+    };
+    if ($contract->is_valid) {
+        ...
+    };
+
+And
+
+    use Test::Refute::Contract;
+
+    my $contract = contract {
+        my $c = shift;
+        $c->is( $foo, $bar, "foobar" );
+    };
+    if ($contract->is_valid) {
+        ...
+    };
 
 =cut
 
@@ -54,7 +82,7 @@ sub contract (&;$) { ## no critic # need block function
     $engine ||= __PACKAGE__->new;
     $engine->start_testing;
 
-    $code->();
+    $code->($engine);
     $engine->done_testing
         unless $engine->is_done;
     return $engine;
