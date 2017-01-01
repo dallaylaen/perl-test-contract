@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0111;
+our $VERSION = 0.0112;
 
 =head1 NAME
 
@@ -42,7 +42,16 @@ Check for equality, undef equals undef and nothing else.
 
 # See Test::Refute::Basic::Is for implementation
 
-=head2 is $got, $expected, "explanation"
+=head2 contract_is Test::Refute::Contract, "11000101", "explanation"
+
+Check that tests denoted by 1 pass, and those denoted by 0 fail.
+An verbose summary is diag'ed in case of failure.
+
+=cut
+
+# See Test::Refute::Basic::Is for implementation
+
+=head2 isnt $got, $expected, "explanation"
 
 The reverse of is().
 
@@ -154,17 +163,52 @@ sub _like_unlike {
 build_refute can_ok => sub {
     my $class = shift;
 
+    croak ("can_ok(): no methods to check!")
+        unless @_;
+
+    return 'undefined' unless defined $class;
+    return 'Not an object: '.to_scalar($class)
+        unless UNIVERSAL::can( $class, "can" );
+
     my @missing = grep { !$class->can($_) } @_;
-    return @missing && to_scalar($class, 0)." has no methods ".join ", ", @missing;
-}, no_pop => 1, export =>1;
+    return @missing && (to_scalar($class, 0)." has no methods ".join ", ", @missing);
+}, no_pop => 1, export => 1;
 
-=head2 contract_is Test::Refute::Contract, "11000101", "explanation"
-
-Check that tests denoted by 1 pass, and those denoted by 0 fail.
-An verbose summary is diag'ed in case of failure.
+=head2 isa_ok
 
 =cut
 
-# See Test::Refute::Basic::Is for implementation
+build_refute isa_ok => \&_isa_ok, args => 2, export => 1;
+
+build_refute new_ok => sub {
+    my ($class, $args, $target) = @_;
+
+    $args   ||= [];
+    $target ||= $class;
+
+    return "Not a class: ".to_scalar($class, 0)
+        unless UNIVERSAL::can( $class, "can" );
+    return "Class has no 'new' method: ".to_scalar( $class, 0 )
+        unless $class->can( "new" );
+
+    return _isa_ok( $class->new( @$args ), $target );
+}, no_pop => 1, export => 1;
+
+sub _isa_ok {
+    my ($obj, $class) = @_;
+
+    croak 'isa_ok(): No class supplied to check against'
+        unless defined $class;
+    return "undef is not a $class" unless defined $obj;
+    $class = ref $class || $class;
+
+    if (
+        (UNIVERSAL::can( $obj, "isa" ) && !$obj->isa( $class ))
+        || !UNIVERSAL::isa( $obj, $class )
+    ) {
+        return to_scalar( $obj, 0 ) ." is not a $class"
+    };
+    return '';
+};
 
 1;
