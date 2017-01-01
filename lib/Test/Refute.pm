@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0111;
+our $VERSION = 0.0112;
 
 =head1 NAME
 
@@ -149,6 +149,9 @@ sub plan($$) { ## no critic
     };
 
     refute_engine->$todo( $arg );
+    if (refute_engine eq $main_engine and $todo eq 'skip_all') {
+        exit 0; # Yuuuurgh - Test::More compat :(
+    };
 };
 
 =head2 diag( $text )
