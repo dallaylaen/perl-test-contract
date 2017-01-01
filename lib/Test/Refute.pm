@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0112;
+our $VERSION = 0.0113;
 
 =head1 NAME
 
@@ -98,9 +98,9 @@ use Test::Refute::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest);
-our @EXPORT = (@wrapper, @Test::Refute::Basic::EXPORT
-    , qw(contract is_deeply explain plan)
-    );
+my @own = qw(BAIL_OUT explain plan);
+my @reexport = qw(contract is_deeply plan);
+our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
 my $main_engine;
 
 # FIXME Have to make ugly hacks for Test::More compatibility
@@ -183,6 +183,8 @@ can be executed after this call.
 
 =head2 bail_out( $text )
 
+=head2 BAIL_OUT( $text )
+
 Stop testing here, interrupting all further testing.
 
 =cut
@@ -215,6 +217,11 @@ foreach (@wrapper) {
 
     no strict 'refs'; ## no critic
     *$name = $code;
+};
+
+{
+    no warnings 'once'; ## no critic
+    *BAIL_OUT = \&bail_out; # alias
 };
 
 =head2 contract { CODE; };
