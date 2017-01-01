@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0113;
+our $VERSION = 0.0114;
 
 =head1 NAME
 
@@ -102,19 +102,25 @@ my @own = qw(BAIL_OUT explain plan);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
 my $main_engine;
+my $no_plan_seen;
 
 # FIXME Have to make ugly hacks for Test::More compatibility
 
 sub import {
-    my ($self, $t, $n, @rest) = @_;
+    my ($self, $t, @rest) = @_;
 
     # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
     $main_engine ||= Test::Refute::TAP->new;
     $main_engine->start_testing;
 
     if ($t and $t eq 'tests') {
-        plan( tests => $n );
+        plan( tests => shift @rest );
         @_ = ($self, @rest);
+    }
+    elsif( $t and $t eq 'no_plan') {
+        carp "DEPRECATED. put a done_testing(); at the end of the script and remove 'no_plan'";
+        @_ = ($self, @rest);
+        $no_plan_seen++;
     };
 
     goto &Exporter::import; ## no critic
@@ -192,7 +198,7 @@ Stop testing here, interrupting all further testing.
 END {
     if ($main_engine and $main_engine->test_number) {
         croak "done_testing was not seen"
-            unless $main_engine->get_plan;
+            unless $main_engine->get_plan or $no_plan_seen;
 
         $main_engine->done_testing
             unless $main_engine->is_done;
