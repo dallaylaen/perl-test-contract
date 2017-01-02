@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0117;
+our $VERSION = 0.0118;
 
 =head1 NAME
 
@@ -110,9 +110,14 @@ our $TODO; # unimplemented - use contract instead!
 sub import {
     my ($self, $t, @rest) = @_;
 
-    # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
-    $main_engine ||= Test::Refute::TAP->new;
-    $main_engine->start_testing;
+    # TODO optimize branching here
+    if ($t and $t eq 'no_init') {
+        @_ = ($self, @rest);
+    } else {
+        # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
+        $main_engine ||= Test::Refute::TAP->new;
+        $main_engine->start_testing;
+    };
 
     if ($t and $t eq 'tests') {
         plan( tests => shift @rest );
@@ -242,7 +247,7 @@ sub skip(@) { ## no critic
 
 END {
     if ($main_engine and $main_engine->test_number) {
-        croak "done_testing was not seen"
+        croak "[$$] done_testing was not seen"
             unless $main_engine->get_plan or $no_plan_seen;
 
         $main_engine->done_testing
@@ -284,6 +289,21 @@ Returns a contract object.
 See GETTERS in L<Test::Refute::Contract> for reference.
 
 =cut
+
+=head2 reset
+
+Resets the default engine, say after a fork.
+
+This is not exxported, call via ->.
+
+=cut
+
+sub reset {
+    if ($main_engine) {
+        $main_engine->skip_all("reset called");
+        undef $main_engine;
+    };
+};
 
 =head1 AUTHOR
 

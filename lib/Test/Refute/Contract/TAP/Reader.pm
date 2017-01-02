@@ -2,7 +2,7 @@ package Test::Refute::Contract::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.0102;
+our $VERSION = 0.0103;
 
 =head1 NAME
 
@@ -24,6 +24,14 @@ use Carp;
 use parent qw(Test::Refute::Contract);
 
 sub _NEWOPTIONS { __PACKAGE__->SUPER::_NEWOPTIONS, qw(in pid) };
+
+=head2 read_line( $line )
+
+Read and parse one line of TAP input. State machine involved.
+
+Done this way to allow for future async invocation.
+
+=cut
 
 # parse?
 sub read_line {
@@ -53,15 +61,34 @@ sub read_line {
     };
 };
 
+=head2 diag
+
+Diag is turned off unless previous test failed.
+
+=cut
+
 sub diag {
     my $self = shift;
     $self->SUPER::diag(@_)
         if $self->{want_diag};
 };
 
+=head2 on_pass
+
+Passed tests are omitted for great justice.
+
+=cut
+
 sub on_pass {
     return '';
 };
+
+=head2 eof
+
+End a series of readlines. Some additional checks must be here,
+but not done yet.
+
+=cut
 
 sub eof {
     my ($self) = @_;
@@ -69,6 +96,12 @@ sub eof {
     # generate other tests
     $self->done_testing;
 };
+
+=head2 is_valid
+
+is_valid includes additional checks.
+
+=cut
 
 sub is_valid {
     my $self = shift;
@@ -78,14 +111,11 @@ sub is_valid {
         ;
 };
 
-sub run_command {
-    my ($self, $cmd) = @_;
+=head2 finish
 
-    $self->{pid} = open (my $fd, "-|", $cmd)
-        or die "Failed to start $cmd: $!";
+Read the rest of the test fd.
 
-    $self->{in} = $fd;
-};
+=cut
 
 sub finish {
     my $self = shift;

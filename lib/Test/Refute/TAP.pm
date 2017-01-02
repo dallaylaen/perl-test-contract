@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0111;
+our $VERSION = 0.0112;
 
 =head1 NAME
 
@@ -41,14 +41,14 @@ use parent qw(Test::Refute::Contract);
 sub new {
     my ($class, %opt) = @_;
 
-    # dup2 STDOUT so that we aren't botched by furthe redirect
+    # dup2 STDOUT so that we aren't botched by further redirect
     my $fd = delete $opt{out} || \*STDOUT;
     open (my $dup, ">&", $fd)
         or die "redirect failed: $!";
 
     $opt{out}     = $fd;
     $opt{count}   = 0;
-    $opt{indent}  = ' ' x (($opt{indent}||0) * 4);
+    $opt{indent_cache} = '    ' x ($opt{indent} || 0);
 
     return bless \%opt, $class;
 };
@@ -63,16 +63,7 @@ sub _log {
 
     $mess =~ s#\n+$##s;
     my $fd = $self->{out};
-    print $fd "$self->{indent}$mess\n";
-};
-
-=head2 get_indent
-
-=cut
-
-sub get_indent {
-    my $self = shift;
-    return (length $self->{indent}) / 4;
+    print $fd "$self->{indent_cache}$mess\n";
 };
 
 =head2 get_tap

@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0114;
+our $VERSION = 0.0115;
 
 =head1 NAME
 
@@ -121,10 +121,10 @@ sub subcontract {
 
     my $class = delete $opt{class} || ref $self;
 
-    exists $opt{$_} or $opt{$_} = $self->{$_}
-        for $self->_NEWOPTIONS;
     $opt{indent} = $self->get_indent + 1
         unless exists $opt{indent};
+    exists $opt{$_} or $opt{$_} = $self->{$_}
+        for $self->_NEWOPTIONS;
     return $class->new( %opt );
 };
 
@@ -415,7 +415,7 @@ Indentation increases with each subtest.
 sub get_indent {
     my $self = shift;
 
-    return $self->{indent};
+    return $self->{indent} || 0;
 };
 
 =head1 SUBCLASS METHODS
