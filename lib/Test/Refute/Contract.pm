@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0112;
+our $VERSION = 0.0113;
 
 =head1 NAME
 
@@ -102,9 +102,10 @@ This MAY change in the future.
 sub new {
     my ($class, %opt) = @_;
 
-    return bless {
-        indent => $opt{indent} || 0,
-    }, $class;
+    my $new;
+    $new->{$_} = $opt{$_} for $class->_NEWOPTIONS;
+    $new->{indent} ||= 0;
+    return bless $new, $class;
 };
 
 =head2 subcontract( %options )
@@ -163,7 +164,7 @@ sub refute {
         $self->on_fail( $message, $deny );
         $self->diag( Carp::shortmess( "Failed: $message" ));
         $self->diag( $deny )
-            unless looks_like_number($deny);
+            unless looks_like_number($deny) or ref $deny;
         return 0;
     };
 

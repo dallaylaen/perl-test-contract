@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0116;
+our $VERSION = 0.0117;
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ use Test::Refute::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest);
-my @own = qw(BAIL_OUT explain plan skip $TODO pass fail);
+my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
 my $main_engine;
@@ -202,6 +202,17 @@ sub pass($) { ## no critic
 sub fail($) { ## no critic
     carp "fail(): DEPRECATED. Build your own tests using the refute() primitive.";
     ok (0, @_);
+};
+
+=head2 not_ok $condition, $name
+
+Record a failing test if condition is true. This is really just a prototyped
+frontend to refute().
+
+=cut
+
+sub not_ok {
+    refute_engine->refute(@_);
 };
 
 =head2 done_testing;
