@@ -2,7 +2,7 @@ package Test::Refute::Contract::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.0101;
+our $VERSION = 0.0102;
 
 =head1 NAME
 
@@ -20,6 +20,7 @@ present etc).
 
 =cut
 
+use Carp;
 use parent qw(Test::Refute::Contract);
 
 sub _NEWOPTIONS { __PACKAGE__->SUPER::_NEWOPTIONS, qw(in pid) };
@@ -29,6 +30,8 @@ sub read_line {
     my ($self, $line) = @_;
 
     chomp $line;
+
+#    warn "Got line: $line\n";
     # state machine!
     if ($line =~ /^(not\s+)?ok\s+(\d+)(.*)/) {
         my ($not, $n, $name) = (!! $1, $2, $3);
@@ -46,7 +49,7 @@ sub read_line {
     } elsif ($line =~ /^\s/) {
         # TODO subtest
     } else {
-        warn "Can't recognize line $line";
+        carp "Can't recognize line $line";
     };
 };
 
@@ -71,6 +74,7 @@ sub is_valid {
     my $self = shift;
     return $self->SUPER::is_valid
         && !$self->{order}
+        && defined $self->{plan}
         ;
 };
 

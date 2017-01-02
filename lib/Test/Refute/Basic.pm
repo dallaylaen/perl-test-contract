@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0112;
+our $VERSION = 0.0113;
 
 =head1 NAME
 
@@ -80,13 +80,19 @@ Not really tested well.
 
 =cut
 
+# TODO write it better
 build_refute use_ok => sub {
-    my $mod = shift;
-    my $file = $mod;
-    $file =~ s#::#/#g;
-    $file .= ".pm";
-    eval { require $file; $mod->import; 1 } and return '';
-    return "Failed to load $mod: ".($@ || "(unknown error)");
+    my ($mod, @arg) = @_;
+    my $caller = caller(1);
+    eval "package $caller; use $mod \@arg; 1" and return ''; ## no critic
+    return "Failed to use $mod: ".($@ || "(unknown error)");
+}, no_pop => 1, export => 1;
+
+build_refute require_ok => sub {
+    my ($mod, @arg) = @_;
+    my $caller = caller(1);
+    eval "package $caller; require $mod; 1" and return ''; ## no critic
+    return "Failed to require $mod: ".($@ || "(unknown error)");
 }, args => 1, export => 1;
 
 =head2 cpm_ok $arg, 'operation', $arg2, "explanation"
