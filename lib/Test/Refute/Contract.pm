@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0113;
+our $VERSION = 0.0114;
 
 =head1 NAME
 
@@ -129,7 +129,7 @@ sub subcontract {
 };
 
 sub _NEWOPTIONS {
-    return ();
+    return qw(indent);
 };
 
 =head2 refute( $condition, $name )
@@ -397,7 +397,11 @@ sub get_tap {
 
     $verbose = 1 unless defined $verbose;
     $verbose++;
-    return join "\n", grep { !/^#{$verbose}/ } @{ $self->{log} }, '';
+
+    my $dent = '    ' x $self->get_indent;
+    return join "\n",
+        (map { "$dent$_" } grep { !/^#{$verbose}/ } @{ $self->{log} })
+        , '';
 };
 
 =head2 get_indent
