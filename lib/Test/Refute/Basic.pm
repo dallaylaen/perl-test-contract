@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0114;
+our $VERSION = 0.0115;
 
 =head1 NAME
 
@@ -158,6 +158,7 @@ sub _like_unlike {
 
     $reg = qr#^(?:$reg)$# unless ref $reg eq 'Regexp';
         # retain compatibility with Test::More
+    return 'unexpected undef' if !defined $str;
     return '' if $str =~ $reg xor $reverse;
     return "$str\n".($reverse ? "unexpectedly matches" : "doesn't match")."\n$reg";
 };
@@ -190,6 +191,7 @@ build_refute new_ok => sub {
     my ($class, $args, $target) = @_;
 
     $args   ||= [];
+    $class  = ref $class || $class;
     $target ||= $class;
 
     return "Not a class: ".to_scalar($class, 0)
