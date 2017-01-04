@@ -37,6 +37,9 @@ if (@preload) {
     unshift @INC, @inc;
 
     package isolated;
+    require FindBin;
+    FindBin->import('$Bin');
+
     foreach my $mod( @preload ) {
         my $fname = $mod;
         $fname =~ s#::#/#g;
@@ -71,6 +74,7 @@ if ($failed) {
 
 exit !$all->is_valid;
 
+# TODO move this into TAP::Reader after all
 sub get_reader {
     my $f = shift;
 
