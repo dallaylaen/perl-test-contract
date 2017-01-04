@@ -19,6 +19,4 @@ is $lines[1], '# Foo again[1, 2, 3, 4, 5]', 'diag + auto-explain';
 is $lines[2], '## Bar', 'single note';
 is $lines[3], '## Baz {"foo":42}', 'note + explain';
 
-
-
 done_testing;

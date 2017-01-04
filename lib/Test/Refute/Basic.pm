@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0115;
+our $VERSION = 0.0116;
 
 =head1 NAME
 
@@ -118,7 +118,7 @@ build_refute cmp_ok => sub {
         if @missing;
 
     my $fun = $compare{$op};
-    croak "Comparison '$op' not implemented"
+    croak "cmp_ok(): Comparison '$op' not implemented"
         unless $fun;
 
     return '' if $fun->($x, $y);
