@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0115;
+our $VERSION = 0.0116;
 
 =head1 NAME
 
@@ -157,12 +157,11 @@ sub refute {
         if $self->{skip_all};
 
     $self->{count}++;
-    $message ||= "test $self->{count}";
 
     if ($deny) {
         $self->{fails}++;
         $self->on_fail( $message, $deny );
-        $self->diag( Carp::shortmess( "Failed: $message" ));
+        $self->diag( Carp::shortmess( "Failed: ".($message || $self->{count}) ));
         $self->diag( $deny )
             unless looks_like_number($deny) or ref $deny;
         return 0;
@@ -258,6 +257,51 @@ sub done_testing {
 
     return $self;
 };
+
+=head1 JOINING CONTRACTS
+
+=head2 contract_is( $other_contract, "100101", "name..." )
+
+Check that a given contract contains exactly the passed/failed tests
+denoted by the bit string.
+
+B<EXPERIMENTAL> The second argument's meaning MAY change or be extended
+in the future.
+
+See also sign() below.
+
+=cut
+
+sub contract_is {
+    my ($self, $c, $condition, $name) = @_;
+
+    # the happy case first
+    my $not_ok = $c->get_failed;
+    my @out = map { $not_ok->{$_} ? 0 : 1 } 1..$c->test_number;
+    return $self->refute( '', $name )
+        if $condition eq join "", @out;
+
+    # analyse what went wrong - it did if we're here
+    my @cond = split / *?/, $condition;
+    my @fail;
+    push @fail, "Contract signature: @out";
+    push @fail, "Expected:           @cond";
+    push @fail, sprintf "Tests executed: %d of %d", scalar @out, scalar @cond
+        if @out != @cond;
+    for (my $i = 0; $i<@out && $i<@cond; $i++) {
+        next if $out[$i] eq $cond[$i];
+        my $n = $i + 1;
+        push @fail, "Unexpected " .($not_ok->{$n} ? "not ok $n" : "ok $n");
+        if ($not_ok->{$n}) {
+            push @fail, map { "DIAG # $_" } split /\n+/, $not_ok->{$n}[1]
+        };
+    };
+
+    croak "Impossible: contract_is/sign broken. File a bug immediately!"
+        if !@fail;
+    return $self->refute( join "\n", @fail );
+};
+
 
 =head2 sign( expectation, comment)
 
@@ -359,7 +403,7 @@ Returns truth if no tests failed so far.
 
 sub is_valid {
     my $self = shift;
-    return !$self->{fails};
+    return !$self->{fails} && !$self->{bail_out};
 };
 
 =head2 error_count
@@ -433,7 +477,7 @@ What to do when test passes.
 sub on_pass {
     my ($self, $name) = @_;
 
-    $self->_log( join " ", "ok", $self->test_number, "-", $name );
+    $self->_log( join " ", "ok", $self->test_number, $name ? ("-", $name) : () );
     return;
 };
 
@@ -447,7 +491,7 @@ sub on_fail {
     my ($self, $name, $cond) = @_;
 
     $self->{failed}{ $self->test_number } = [ $name, $cond ];
-    $self->_log( join " ", "not ok", $self->test_number, "-", $name );
+    $self->_log( join " ", "not ok", $self->test_number, $name ? ("-", $name) : () );
     return;
 };
 
@@ -513,9 +557,9 @@ sub bail_out {
     my ($self, $mess) = @_;
 
     $mess ||= '';
-    $self->refute( "Bail out", $mess );
     $self->_log( "Bail out! $mess" );
     $self->{skip_all} = "Bail out! $mess";
+    $self->{bail_out} = $mess || "unknown reason";
     return;
 };
 

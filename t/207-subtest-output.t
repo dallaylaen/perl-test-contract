@@ -28,15 +28,15 @@ note $output;
 $output =~ s/^ *#.*$//mg;
 $output =~ s/\n\n+/\n/gs;
 is ($output, <<OUT, "Would-be output as expected");
-ok 1 - test 1
-    ok 1 - test 1
+ok 1
+    ok 1
     1..1
 ok 2 - pass
-    ok 1 - test 1
-    not ok 2 - test 2
+    ok 1
+    not ok 2
     1..2
 not ok 3 - fail
-ok 4 - test 4
+ok 4
 1..4
 OUT
 

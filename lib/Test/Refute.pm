@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0118;
+our $VERSION = 0.0119;
 
 =head1 NAME
 
@@ -97,7 +97,7 @@ use Test::Refute::TAP;
 use Test::Refute::Deep;
 
 use parent qw(Exporter);
-my @wrapper = qw(done_testing note diag bail_out subtest);
+my @wrapper = qw(done_testing note diag bail_out subtest contract_is);
 my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
@@ -219,6 +219,12 @@ frontend to refute().
 sub not_ok {
     refute_engine->refute(@_);
 };
+
+=head2 contract_is $contract_object, "100101", "explanation"
+
+Check that contract was fullfilled exactly to the specified extent.
+1s denote passed tests and 0s denote failed ones.
+No extra/missing tests (in that contract) allowed.
 
 =head2 done_testing;
 

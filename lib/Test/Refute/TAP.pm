@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0112;
+our $VERSION = 0.0113;
 
 =head1 NAME
 
@@ -45,12 +45,12 @@ sub new {
     my $fd = delete $opt{out} || \*STDOUT;
     open (my $dup, ">&", $fd)
         or die "redirect failed: $!";
-
     $opt{out}     = $fd;
-    $opt{count}   = 0;
-    $opt{indent_cache} = '    ' x ($opt{indent} || 0);
 
-    return bless \%opt, $class;
+    my $self = $class->SUPER::new( %opt );
+    $self->{indent_cache} = '    ' x $self->get_indent;
+
+    return $self;
 };
 
 sub _NEWOPTIONS {
@@ -75,18 +75,24 @@ However, it may be reconstructed to some extent...
 =cut
 
 sub get_tap {
-    my $self = shift;
+    my ($self, $verb) = @_;
 
-    my @result = ("1..".$self->test_number);
-
+    my @result;
     my $fails = $self->get_failed;
 
     foreach my $n (1 .. $self->test_number) {
-        my $f = $fails->{$_};
-        push @result, $f
-            ? ("not ok $n - $f->[0]", map { "# $_" } split "\n", $f->[1])
-            : "ok $n";
+        my $f = $fails->{$n};
+        if (!$f) {
+            push @result, "ok $n";
+            next;
+        };
+        push @result
+            , "not ok $n - $f->[0]"
+            , $verb ? map { "# $_" } split "\n", $f->[1] : ();
     };
+    push @result, $self->{bail_out}
+        ? "Bail out! $self->{bail_out}"
+        : "1..".$self->test_number;
 
     return join "\n", @result, '';
 };

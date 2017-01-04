@@ -2,7 +2,7 @@ package Test::Refute::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0113;
+our $VERSION = 0.0114;
 
 =head1 NAME
 
@@ -31,8 +31,7 @@ the same signature is generated for each of them (see L<Test::Refute::Build>).
 use Carp;
 use parent qw(Exporter);
 use Test::Refute::Build;
-use Test::Refute::Basic::Is;
-our @EXPORT = @Test::Refute::Basic::Is::EXPORT;
+our @EXPORT;
 
 =head2 is $got, $expected, "explanation"
 
@@ -40,16 +39,17 @@ Check for equality, undef equals undef and nothing else.
 
 =cut
 
-# See Test::Refute::Basic::Is for implementation
+build_refute is => sub {
+    my ($got, $exp) = @_;
 
-=head2 contract_is Test::Refute::Contract, "11000101", "explanation"
+    if (defined $got xor defined $exp) {
+        return "unexpected ". to_scalar($got, 0);
+    };
 
-Check that tests denoted by 1 pass, and those denoted by 0 fail.
-An verbose summary is diag'ed in case of failure.
-
-=cut
-
-# See Test::Refute::Basic::Is for implementation
+    return '' if !defined $got or $got eq $exp;
+    return sprintf "Got:      %s\nExpected: %s"
+        , to_scalar($got, 0), to_scalar($exp, 0);
+}, args => 2, export => 1;
 
 =head2 isnt $got, $expected, "explanation"
 
