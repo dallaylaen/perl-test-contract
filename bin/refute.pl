@@ -25,6 +25,7 @@ GetOptions (
     "I=s" => \@inc,
     "help" => \&usage,
     "preload=s" => \@preload,
+    "faketest" => sub { lib->import( dirname(__FILE__)."/../fake_lib"); },
 ) or die "Bad options. See $0 --help";
 
 sub usage {
@@ -34,6 +35,7 @@ $0 [options] [test_dir] ...
 Options may include:
     -I - add a library path
     --preload Module::Name,Other::Module... - experimental module caching mode
+    --faketest (EXPERIMENTAL) - use Test::Refute in place of Test::More
     --help - this message
 This is ALPHA software, use prove(1) when in doubt.
 HELP
