@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package Test::Refute::bin;
+package Test::Refute::bin; # avoid polluting main
 
 use strict;
 use warnings;
@@ -16,6 +16,9 @@ use Test::Refute::Contract::TAP::Reader;
 
 my $all = Test::Refute::TAP->new->start_testing;
 
+# make Getopt work with Perl-ish notation
+@ARGV = map { /(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
+
 my @inc;
 my @preload;
 GetOptions (
@@ -23,6 +26,19 @@ GetOptions (
     "help" => \&usage,
     "preload=s" => \@preload,
 ) or die "Bad options. See $0 --help";
+
+sub usage {
+    print <<"HELP";
+$0 [options] [test_dir] ...
+- A TAP-based test suite runner
+Options may include:
+    -I - add a library path
+    --preload Module::Name,Other::Module... - experimental module caching mode
+    --help - this message
+This is ALPHA software, use prove(1) when in doubt.
+HELP
+    exit 0;
+};
 
 my @plopt;
 push @plopt, map { "-I$_" } @inc;
