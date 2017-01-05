@@ -2,7 +2,7 @@ package Test::Refute::Contract::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.0201;
 
 =head1 NAME
 
@@ -23,7 +23,53 @@ present etc).
 use Carp;
 use parent qw(Test::Refute::Contract);
 
+=head2 new( in => $fd | exec => "command" | eval => sub { CODE; } )
+
+Create a new TAP reader object.
+
+=cut
+
+# TODO Way too complex, should be in helper subs instead
+
 sub _NEWOPTIONS { __PACKAGE__->SUPER::_NEWOPTIONS, qw(in pid) };
+sub new {
+    my ($class, %opt) = @_;
+
+    1 == scalar grep { $opt{$_} } qw(in exec eval) # TODO better names
+        or croak "$class->new: exactly one of (in, exec, eval) required";
+
+    if ($opt{exec}) {
+        $opt{exec} = [ $opt{exec} ]
+            unless ref $opt{exec} eq 'ARRAY';
+        my $pid   = open (my $fd, "-|", @{ $opt{exec} })
+            or croak "$class->new: Failed to read from cmd: $opt{exec}[0]: $!";
+        $opt{in}  = $fd;
+        $opt{pid} = $pid;
+    }
+    elsif ($opt{eval}) {
+        pipe my $f_r, my $f_w;
+        my $pid = fork;
+        croak "$class->new: fork() failed: $!"
+            unless defined $pid;
+        if (!$pid) {
+            # CHILD SECTION
+            close $f_r;
+            if ($opt{replace_stdout}) {
+                open STDOUT, ">&", $f_w
+                    or die "Failed to redirect stdout to pipe: $!";
+                $f_w = \*STDOUT;
+            };
+            $opt{eval}->($f_w);
+            exit;
+            # CHILD SECTION ENDS
+        };
+        close $f_w;
+        $opt{in} = $f_r;
+        $opt{pid} = $pid;
+    };
+
+    return $class->SUPER::new(%opt);
+};
 
 =head2 read_line( $line )
 

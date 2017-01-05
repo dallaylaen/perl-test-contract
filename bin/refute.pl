@@ -97,32 +97,20 @@ sub get_reader {
     my ($in, $pid);
 
     if (@preload) {
-        pipe ($in, my $out)
-            or die "Aborting tests: pipe failed: $!";
-        defined ($pid = fork)
-            or die "Aborting tests: fork failed: $!";
+        return Test::Refute::Contract::TAP::Reader->new (
+            indent => 1, replace_stdout => 1, eval => sub {
+                $0 = $f;
+                @ARGV = ();
+                Test::Refute->reset;
 
-        if (!$pid) {
-            # CHILD
-            close $in;
-            open STDOUT, ">&", $out
-                or die "dup2 failed: $!";
-
-            $0 = $f;
-            @ARGV = ();
-            Test::Refute->reset;
-
-            eval { package main; do $f; 1 }
-                or do {
-                    not_ok $@ || $! || 1, "died";
-                    exit 1;
-                };
-            exit 0;
-            # CHILD END
-        };
-
-        # PARENT
-        close $out;
+                eval { package main; do $f; 1 }
+                    or do {
+                        not_ok $@ || $! || 1, "died";
+                        exit 1;
+                    };
+                exit 0;
+            } );
+        # end callback && end if (preload)
     } else {
         my @localopt;
         open (my $peek, "<", $f)
@@ -131,15 +119,8 @@ sub get_reader {
         $line =~ /\s-T\b/ and push @localopt, "-T";
         close $peek;
 
-        $pid = open ($in, "-|", perl => @plopt => @localopt => $f)
-            or do {
-                ok 0, $f;
-                diag $!;
-                next;
-            };
+        return Test::Refute::Contract::TAP::Reader->new (
+            indent => 1, exec => [ perl => @plopt => @localopt => $f ] );
     };
-
-    my $tap = Test::Refute::Contract::TAP::Reader->new (
-        in => $in, pid => $pid, indent => 1 );
 };
 
