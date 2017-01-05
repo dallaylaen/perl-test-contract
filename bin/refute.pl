@@ -61,7 +61,7 @@ if (@preload) {
     foreach my $mod( @preload ) {
         my $fname = $mod;
         $fname =~ s#::#/#g;
-        $fname .= ".pm";
+        $fname .= ".pm" unless $fname =~ /\.p[lm]$/;
         require $fname;
         warn "Preloaded $mod from $INC{$fname}\n";
     };
