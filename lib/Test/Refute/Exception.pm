@@ -2,7 +2,7 @@ package Test::Refute::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.0104;
+our $VERSION = 0.02;
 
 =head1 NAME
 

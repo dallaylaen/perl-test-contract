@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0113;
+our $VERSION = 0.02;
 
 =head1 NAME
 

@@ -2,7 +2,7 @@ package Test::Refute::Contract::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.0103;
+our $VERSION = 0.02;
 
 =head1 NAME
 

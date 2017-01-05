@@ -2,7 +2,7 @@ package Test::Refute::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0105;
+our $VERSION = 0.02;
 
 =head1 NAME
 
