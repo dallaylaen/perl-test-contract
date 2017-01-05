@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+package Test::Refute::bin;
+
 use strict;
 use warnings;
 use File::Find;
@@ -36,9 +38,7 @@ find( sub {
 if (@preload) {
     unshift @INC, @inc;
 
-    package isolated;
-    require FindBin;
-    FindBin->import('$Bin');
+    package main;
 
     foreach my $mod( @preload ) {
         my $fname = $mod;
@@ -92,13 +92,13 @@ sub get_reader {
             open STDOUT, ">&", $out
                 or die "dup2 failed: $!";
 
+            $0 = $f;
             @ARGV = ();
             Test::Refute->reset;
-            $FindBin::Bin = $FindBin::Bin = dirname($f);
 
-            eval { package isolated; do $f; 1 }
+            eval { package main; do $f; 1 }
                 or do {
-                    not_ok $! || 1, "died";
+                    not_ok $@ || $! || 1, "died";
                     exit 1;
                 };
             exit 0;
