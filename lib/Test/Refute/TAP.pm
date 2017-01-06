@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.0203;
 
 =head1 NAME
 
@@ -80,7 +80,7 @@ sub get_tap {
     my @result;
     my $fails = $self->get_failed;
 
-    foreach my $n (1 .. $self->test_number) {
+    foreach my $n (1 .. $self->get_count) {
         my $f = $fails->{$n};
         if (!$f) {
             push @result, "ok $n";
@@ -92,7 +92,7 @@ sub get_tap {
     };
     push @result, $self->{bail_out}
         ? "Bail out! $self->{bail_out}"
-        : "1..".$self->test_number;
+        : "1..".$self->get_count;
 
     return join "\n", @result, '';
 };

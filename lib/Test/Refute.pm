@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.0203;
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ However, it can also work inside an application:
         is ($user_input->{foo}, $bar, "Input as expected" );
         like ($user_input->{baz}, qr/f?o?r?m?a?t?/, "Format good" );
     };
-    if (!$contract->is_valid) {
+    if (!$contract->get_passed) {
         ...
     };
 
@@ -41,7 +41,7 @@ Or using the OO interface, if you prefer:
     my $contract = Test::Refute::Contract->new;
     $contract->like( $something, $something_else );
     $contract->done_testing; # this may be omitted
-    if (!$contract->is_valid) {
+    if (!$contract->get_passed) {
         ...
     };
 
@@ -252,20 +252,20 @@ sub skip(@) { ## no critic
 };
 
 END {
-    if ($main_engine and $main_engine->test_number) {
+    if ($main_engine and $main_engine->get_count) {
         croak "[$$] done_testing was not seen"
             unless $main_engine->get_plan or $no_plan_seen;
 
         $main_engine->done_testing
-            unless $main_engine->is_done;
+            unless $main_engine->get_finished;
 
-        my $ret = $main_engine->error_count;
+        my $ret = $main_engine->get_error_count;
         $ret = 100 if $ret > 100;
         $? = $ret;
     }
-    elsif ($main_engine and $main_engine->is_skipped) {
+    elsif ($main_engine and $main_engine->get_skipped) {
         $main_engine->done_testing
-            unless $main_engine->is_done;
+            unless $main_engine->get_finished;
     };
 };
 

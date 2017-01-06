@@ -2,7 +2,7 @@ package Test::Refute::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.0203;
 
 =head1 NAME
 
@@ -204,7 +204,7 @@ Not exported by default.
 =cut
 
 sub refute_engine_cleanup {
-    while (@stack and (!$stack[-1] or $stack[-1]->is_done)) {
+    while (@stack and (!$stack[-1] or $stack[-1]->get_finished)) {
         pop @stack;
     };
     return scalar @stack;

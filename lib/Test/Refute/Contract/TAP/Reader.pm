@@ -2,7 +2,7 @@ package Test::Refute::Contract::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.0201;
+our $VERSION = 0.0203;
 
 =head1 NAME
 
@@ -92,7 +92,7 @@ sub read_line {
         $name =~ s/^\s*-\s*//;
         $self->refute( $not, $name );
         $self->{want_diag} = $not;
-        $self->{order}++ if $n != $self->test_number;
+        $self->{order}++ if $n != $self->get_count;
     } elsif ($line =~ /^#+(.*)/) {
         $self->diag($1);
     } elsif ($line =~ /^1..(\d+)/) {
@@ -143,15 +143,15 @@ sub eof {
     $self->done_testing;
 };
 
-=head2 is_valid
+=head2 get_passed
 
-is_valid includes additional checks.
+get_passed includes additional checks.
 
 =cut
 
-sub is_valid {
+sub get_passed {
     my $self = shift;
-    return $self->SUPER::is_valid
+    return $self->SUPER::get_passed
         && !$self->{order}
         && defined $self->{plan}
         ;

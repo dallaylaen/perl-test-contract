@@ -90,7 +90,7 @@ if ($failed) {
     print "RESULT: PASS\n";
 };
 
-exit !$all->is_valid;
+exit !$all->get_passed;
 
 # TODO move this into TAP::Reader after all
 sub get_reader {

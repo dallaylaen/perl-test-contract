@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.0203;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ Test::Refute::Contract - apply a series of tests/assertions within an applicatio
         my $contract = Test::Refute::Contract->new;
         $contract->is( $user_data->answer, 42, "Life and everything" );
         $contract->done_testing;
-        if ($contract->is_valid) {
+        if ($contract->get_passed) {
             ...
         };
     };
@@ -58,7 +58,7 @@ These two are equivalent:
     my $contract = contract {
         is $foo, $baf, "foobar";
     };
-    if ($contract->is_valid) {
+    if ($contract->get_passed) {
         ...
     };
 
@@ -70,7 +70,7 @@ And
         my $c = shift;
         $c->is( $foo, $bar, "foobar" );
     };
-    if ($contract->is_valid) {
+    if ($contract->get_passed) {
         ...
     };
 
@@ -84,7 +84,7 @@ sub contract (&;$) { ## no critic # need block function
 
     $code->($engine);
     $engine->done_testing
-        unless $engine->is_done;
+        unless $engine->get_finished;
     return $engine;
 };
 
@@ -199,7 +199,7 @@ sub plan {
     croak "plan(): argument must be numeric"
         unless $n =~ /^\d+$/;
     croak "plan(): testing already started"
-        if $self->test_number;
+        if $self->get_count;
 
     $self->{plan} = $n;
     return $self;
@@ -213,7 +213,7 @@ reason must be true, or this won't work!
 
 sub skip_all {
     my ($self, $reason) = @_;
-    return if $self->is_done;
+    return if $self->get_finished;
     $self->{skip_all} ||= $reason || 'unknown reason';
 };
 
@@ -229,7 +229,7 @@ sub subtest {
 
     my $subc = $self->subcontract;
     &contract( $code, $subc );
-    $self->refute( $subc->error_count, $name);
+    $self->refute( $subc->get_error_count, $name);
 };
 
 =head2 done_testing
@@ -243,9 +243,9 @@ sub done_testing {
 
     $self->{done} and croak "done_testing() called twice";
 
-    if ($self->{plan} and !$self->{skip_all} and $self->{plan} != $self->test_number) {
+    if ($self->{plan} and !$self->{skip_all} and $self->{plan} != $self->get_count) {
         $self->refute(
-            sprintf( "made %d/%d tests", $self->test_number, $self->{plan} )
+            sprintf( "made %d/%d tests", $self->get_count, $self->{plan} )
             , "plan failed!"
         )
     };
@@ -277,7 +277,7 @@ sub contract_is {
 
     # the happy case first
     my $not_ok = $c->get_failed;
-    my @out = map { $not_ok->{$_} ? 0 : 1 } 1..$c->test_number;
+    my @out = map { $not_ok->{$_} ? 0 : 1 } 1..$c->get_count;
     return $self->refute( '', $name )
         if $condition eq join "", @out;
 
@@ -349,13 +349,13 @@ sub DESTROY {
 
 =head1 GETTERS
 
-=head2 is_done
+=head2 get_finished
 
 Return truth if testing is finished.
 
 =cut
 
-sub is_done {
+sub get_finished {
     my $self = shift;
 
     return $self->{done};
@@ -372,47 +372,47 @@ B<EXPERIMENTAL> Logic is not obvious.
 sub get_plan {
     my $self = shift;
 
-    return $self->{plan} || ($self->is_done && $self->test_number);
+    return $self->{plan} || ($self->get_finished && $self->get_count);
 };
 
-=head2 is_skipped
+=head2 get_skipped
 
 =cut
 
-sub is_skipped {
+sub get_skipped {
     my $self = shift;
     return $self->{skip_all} || '';
 };
 
-=head2 test_number
+=head2 get_count
 
 Returns number of tests run so far
 
 =cut
 
-sub test_number {
+sub get_count {
     my $self = shift;
     return $self->{count} || 0;
 };
 
-=head2 is_valid
+=head2 get_passed
 
 Returns truth if no tests failed so far.
 
 =cut
 
-sub is_valid {
+sub get_passed {
     my $self = shift;
     return !$self->{fails} && !$self->{bail_out};
 };
 
-=head2 error_count
+=head2 get_error_count
 
 Returns number of tests that failed.
 
 =cut
 
-sub error_count {
+sub get_error_count {
     my $self = shift;
     return $self->{fails} || 0;
 };
@@ -477,7 +477,7 @@ What to do when test passes.
 sub on_pass {
     my ($self, $name) = @_;
 
-    $self->_log( join " ", "ok", $self->test_number, $name ? ("-", $name) : () );
+    $self->_log( join " ", "ok", $self->get_count, $name ? ("-", $name) : () );
     return;
 };
 
@@ -490,8 +490,8 @@ What to do when test fails.
 sub on_fail {
     my ($self, $name, $cond) = @_;
 
-    $self->{failed}{ $self->test_number } = [ $name, $cond ];
-    $self->_log( join " ", "not ok", $self->test_number, $name ? ("-", $name) : () );
+    $self->{failed}{ $self->get_count } = [ $name, $cond ];
+    $self->_log( join " ", "not ok", $self->get_count, $name ? ("-", $name) : () );
     return;
 };
 
@@ -508,7 +508,7 @@ sub diag {
 
     #
     croak "diag(): Testing finished"
-        if $self->is_done;
+        if $self->get_finished;
     $self->_log( join " ", "#", $_ )
         for split /\n+/, join "",
             map { defined $_ && !ref $_ ? $_ : to_scalar($_); } @mess;
@@ -542,7 +542,7 @@ sub on_done {
     my $self = shift;
 
     my $comment = $self->{skip_all} ? (' # SKIP '.$self->{skip_all} ) : '';
-    $self->_log( "1.." .$self->test_number . $comment );
+    $self->_log( "1.." .$self->get_count . $comment );
 };
 
 =head2 bail_out( $reason )
