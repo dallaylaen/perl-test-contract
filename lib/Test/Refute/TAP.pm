@@ -2,7 +2,7 @@ package Test::Refute::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -42,10 +42,15 @@ sub new {
     my ($class, %opt) = @_;
 
     # dup2 STDOUT so that we aren't botched by further redirect
-    my $fd = delete $opt{out} || \*STDOUT;
-    open (my $dup, ">&", $fd)
-        or die "redirect failed: $!";
-    $opt{out}     = $fd;
+    my $fd = $opt{out} || \*STDOUT;
+    croak "Cannot use closed filehandle for $class->new:out"
+        unless $fd and defined fileno $fd;
+    if (fileno $fd > 0) {
+        # HACK - avoid duping an in-memory ">\$var"
+        open (my $dup, ">&", $fd)
+            or croak "redirect failed: $!";
+        $opt{out}     = $dup;
+    };
 
     my $self = $class->SUPER::new( %opt );
     $self->{indent_cache} = '    ' x $self->get_indent;
@@ -61,9 +66,23 @@ sub _NEWOPTIONS {
 sub _log {
     my ($self, $mess) = @_;
 
-    $mess =~ s#\n+$##s;
     my $fd = $self->{out};
+    return unless $fd;
+    $mess =~ s#\n+$##s;
     print $fd "$self->{indent_cache}$mess\n";
+};
+
+=head2 done_testing
+
+Not only outputs plan, but also closes fh if needed.
+
+=cut
+
+sub done_testing {
+    my $self = shift;
+    my $ret = $self->SUPER::done_testing(@_);
+    delete $self->{out}; # will autoclosed if last
+    return $ret;
 };
 
 =head2 get_tap
@@ -95,6 +114,27 @@ sub get_tap {
         : "1..".$self->get_count;
 
     return join "\n", @result, '';
+};
+
+=head2 get_handle_out
+
+Returns the handle used for output.
+
+=cut
+
+sub get_handle_out {
+    my $self = shift;
+    return $self->{out};
+};
+
+=head2 set_mute
+
+=cut
+
+sub set_mute {
+    my $self = shift;
+    delete $self->{out};
+    return $self->SUPER::set_mute(@_);
 };
 
 1;

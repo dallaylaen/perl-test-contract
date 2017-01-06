@@ -17,7 +17,8 @@ my $tap = Test::Refute::Contract::TAP::Reader->new( in => $read );
 $c->ok( 1, "fine" );
 $c->refute( "reason", "not fine" );
 $c->done_testing;
-close( $write );
+close( $write )
+    or die "$!";
 
 $tap->finish;
 $tap->sign(10);

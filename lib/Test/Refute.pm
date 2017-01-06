@@ -3,7 +3,7 @@ package Test::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -296,17 +296,30 @@ See GETTERS in L<Test::Refute::Contract> for reference.
 
 =cut
 
-=head2 reset
+=head2 MANAGEMENT
 
-Resets the default engine, say after a fork.
+These functions are not exported and should be called as
+normal methods, i.e. Test::Refute->func( args );
 
-This is not exxported, call via ->.
+=head2 Test::Refute->get_engine();
+
+Returns current default contract engine.
+
+=cut
+
+sub get_engine {
+    return refute_engine();
+};
+
+=head2 Test::Refute->reset();
+
+If running in a test script, this resets the engine so that it doesn't pollute
 
 =cut
 
 sub reset {
     if ($main_engine) {
-        $main_engine->skip_all("reset called");
+        $main_engine->set_mute("reset called");
         undef $main_engine;
     };
 };

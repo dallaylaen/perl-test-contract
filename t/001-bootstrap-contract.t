@@ -161,7 +161,7 @@ print "# If passed, at least Test::Refute, contract{}, and \$contract->sign\n";
 print "#     can be used without much risk\n";
 
 sub strip {
-    my $x = shift;
+    my $x = shift || '';
     $x =~ s/(\s*#[^\n]*\n)+/\n/gs;
     return $x;
 };
@@ -172,6 +172,7 @@ my $ntest;
 sub my_is ($$$) { ## no critic
     my ($x, $y, $comment) = @_;
 
+    no warnings 'uninitialized'; ## no critic
     $ntest++;
     if ($x eq $y) {
         print "ok $ntest - $comment\n";

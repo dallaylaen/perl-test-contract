@@ -2,7 +2,7 @@ package Test::Refute::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -344,6 +344,12 @@ sub sign {
 };
 
 sub DESTROY {
+    my $self = shift;
+    foreach my $sub ( @{ $self->{on_done} || [] } ) {
+        eval { $sub->($self); 1 } or do {
+            carp "[$$]: on_done callback failed: $@";
+        };
+    };
     Test::Refute::Build::refute_engine_cleanup();
 };
 
@@ -460,6 +466,52 @@ sub get_indent {
     my $self = shift;
 
     return $self->{indent} || 0;
+};
+
+=head2 get_mute
+
+Tells if the engine was mutes.
+
+=cut
+
+sub get_mute {
+    my $self = shift;
+    return $self->{mute} && ( $self->{skip_all} || "muted" );
+};
+
+=head1 SETTERS
+
+=head2 set_done_callback( sub { ... } );
+
+Setup an action executed in destroy.
+
+May be called multiple times, the actions will be executed in reverse order.
+
+=cut
+
+sub set_done_callback {
+    my ($self, $code) = @_;
+
+    ref $code eq 'CODE'
+        or croak "set_done_callback: argument MUST be a sub";
+
+    push @{ $self->{on_done} }, $code;
+    return $self;
+};
+
+=head2 set_mute ( "reason" )
+
+Don not output anything anymore. Also skip any upcoming tests.
+
+This may be useful say after a fork.
+
+=cut
+
+sub set_mute {
+    my ($self, $reason) = @_;
+
+    $self->{mute}++;
+    $self->skip_all( $reason || "Engine was muted" );
 };
 
 =head1 SUBCLASS METHODS
