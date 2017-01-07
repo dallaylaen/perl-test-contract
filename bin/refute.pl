@@ -20,12 +20,13 @@ my $all = Test::Refute::TAP->new->start_testing;
 @ARGV = map { /(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
 
 my @inc;
+my @fake;
 my @preload;
 GetOptions (
     "I=s" => \@inc,
     "help" => \&usage,
     "preload=s" => \@preload,
-    "faketest" => sub { lib->import( dirname(__FILE__)."/../fake_lib"); },
+    "faketest" => sub { @fake = ( dirname(__FILE__)."/../fake_lib"); },
 ) or die "Bad options. See $0 --help";
 
 sub usage {
@@ -43,7 +44,7 @@ HELP
 };
 
 my @plopt;
-push @plopt, map { "-I$_" } @inc;
+push @plopt, map { "-I$_" } @fake, @inc;
 @preload = split /,/,join ",", @preload;
 
 my @files;
@@ -54,7 +55,7 @@ find( sub {
 @files = sort @files;
 
 if (@preload) {
-    unshift @INC, @inc;
+    unshift @INC, @fake, @inc;
 
     package main;
 
@@ -107,7 +108,6 @@ sub get_reader {
                     package main;
                     do $f;
                     die $@ if $@;
-                    die "Failed to read source '$f': $!" if $!;
                     1;
                 } or do {
                     not_ok $@ || $! || 1, "died";
