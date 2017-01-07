@@ -69,10 +69,9 @@ if (@preload) {
 
 foreach my $f (@files) {
     my $tap = get_reader( $f );
-#    warn "[$$] testing $f\n";
     # TODO parallel??
     $tap->finish;
-    not_ok $tap->get_failed && $tap, $f;
+    not_ok !$tap->get_passed && $tap, $f;
 };
 
 my $failed = $all->get_failed;
@@ -103,13 +102,17 @@ sub get_reader {
             indent => 1, replace_stdout => 1, eval => sub {
                 $0 = $f;
                 @ARGV = ();
-                Test::Refute->reset;
 
-                eval { package main; do $f; 1 }
-                    or do {
-                        not_ok $@ || $! || 1, "died";
-                        exit 1;
-                    };
+                eval {
+                    package main;
+                    do $f;
+                    die $@ if $@;
+                    die "Failed to read source '$f': $!" if $!;
+                    1;
+                } or do {
+                    not_ok $@ || $! || 1, "died";
+                    exit 1;
+                };
                 exit 0;
             } );
         # end callback && end if (preload)

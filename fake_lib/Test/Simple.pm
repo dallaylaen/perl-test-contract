@@ -2,7 +2,7 @@ package Test::Simple;
 
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 STOP!
 
@@ -13,7 +13,7 @@ without rewriting a lot of test scripts.
 =cut
 
 use Carp;
-require Test::Refute;
+use Test::Refute qw(no_init);
 
 # Just re-export everything
 our @ISA = qw(Test::Refute Exporter);
