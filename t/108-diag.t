@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Refute;
+use Test::Contract;
 
 my $c = contract {
     diag "Foo";

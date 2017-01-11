@@ -1,4 +1,4 @@
-package Test::Refute::Basic;
+package Test::Contract::Basic;
 
 use strict;
 use warnings;
@@ -6,13 +6,13 @@ our $VERSION = 0.0203;
 
 =head1 NAME
 
-Test::Refute::Basic - a set of most common tests for Test::Refute suite
+Test::Contract::Basic - a set of most common tests for Test::Contract suite
 
 =head1 DESCRIPTION
 
 B<DO NOT USE THIS MODULE DIRECTLY>.
-Instead, load L<Test::Refute> for functional interface,
-or L<Test::Refute::Contract> for object-oriented one.
+Instead, load L<Test::Contract> for functional interface,
+or L<Test::Contract::Engine> for object-oriented one.
 Both would preload this module.
 
 This module contains most common test conditions similar to those in
@@ -23,14 +23,14 @@ Please refer here for an up-to-date reference.
 
 All functions are prototyped to be used without parentheses and
 exported by default.
-In addition, a C<Test::Refute::Contract-E<gt>function_name> method with
-the same signature is generated for each of them (see L<Test::Refute::Build>).
+In addition, a C<Test::Contract::Engine-E<gt>function_name> method with
+the same signature is generated for each of them (see L<Test::Contract::Build>).
 
 =cut
 
 use Carp;
 use parent qw(Exporter);
-use Test::Refute::Build;
+use Test::Contract::Build;
 our @EXPORT;
 
 =head2 is $got, $expected, "explanation"

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 my ($engine, $count) = @ARGV;
 
-$engine ||= 'Test::Refute';
+$engine ||= 'Test::Contract';
 $count  ||= 1;
 
 if ($engine eq 'print') {

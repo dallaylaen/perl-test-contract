@@ -2,5 +2,5 @@
 
 use strict;
 use warnings;
-use Test::Refute tests => 1;
+use Test::Contract tests => 1;
 ok (1, "placeholder");

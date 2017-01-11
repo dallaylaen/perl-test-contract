@@ -1,12 +1,12 @@
 bin/refute.pl
 Changes
-lib/Test/Refute.pm
-lib/Test/Refute/Basic.pm
-lib/Test/Refute/Contract.pm
-lib/Test/Refute/Contract/TAP/Reader.pm
-lib/Test/Refute/Deep.pm
-lib/Test/Refute/Exception.pm
-lib/Test/Refute/TAP.pm
+lib/Test/Contract.pm
+lib/Test/Contract/Basic.pm
+lib/Test/Contract/Contract.pm
+lib/Test/Contract/Contract/TAP/Reader.pm
+lib/Test/Contract/Deep.pm
+lib/Test/Contract/Exception.pm
+lib/Test/Contract/TAP.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

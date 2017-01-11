@@ -7,7 +7,7 @@ BEGIN {
     $SIG{__WARN__} = sub { push @warn, shift };
 };
 
-use Test::Refute 'no_plan';
+use Test::Contract 'no_plan';
 
 note $warn[0];
 like ($warn[0], "DEPRECATED.*".(quotemeta __FILE__).".*"

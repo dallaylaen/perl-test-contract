@@ -1,4 +1,4 @@
-package Test::Refute::Contract;
+package Test::Contract::Engine;
 
 use strict;
 use warnings;
@@ -6,17 +6,17 @@ our $VERSION = 0.0204;
 
 =head1 NAME
 
-Test::Refute::Contract - apply a series of tests/assertions within an application/module
+Test::Contract::Engine - apply a series of tests/assertions within an application/module
 
 =head1 SYNOPSIS
 
     package My::Module;
-    use Test::Refute::Contract;
+    use Test::Contract::Engine;
 
     sub my_method {
         my $user_data = shift;
 
-        my $contract = Test::Refute::Contract->new;
+        my $contract = Test::Contract::Engine->new;
         $contract->is( $user_data->answer, 42, "Life and everything" );
         $contract->done_testing;
         if ($contract->get_passed) {
@@ -30,12 +30,12 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 use Exporter qw(import);
 
-use Test::Refute::Build qw(to_scalar);
+use Test::Contract::Build qw(to_scalar);
 
 our @EXPORT_OK = qw(contract);
-our @CARP_NOT = qw(Test::Refute::Build Test::Refute);
+our @CARP_NOT = qw(Test::Contract::Build Test::Contract);
 # preload most basic tests
-require Test::Refute::Basic;
+require Test::Contract::Basic;
 
 =head1 OPTIONAL EXPORT
 
@@ -53,7 +53,7 @@ the global namespace.
 
 These two are equivalent:
 
-    use Test::Refute;
+    use Test::Contract;
 
     my $contract = contract {
         is $foo, $baf, "foobar";
@@ -64,7 +64,7 @@ These two are equivalent:
 
 And
 
-    use Test::Refute::Contract;
+    use Test::Contract::Engine;
 
     my $contract = contract {
         my $c = shift;
@@ -90,7 +90,7 @@ sub contract (&;$) { ## no critic # need block function
 
 =head1 METHODS
 
-The generalized object-oriented interface for C<Test::Refute> goes below.
+The generalized object-oriented interface for C<Test::Contract> goes below.
 
 =head2 new()
 
@@ -182,7 +182,7 @@ sub start_testing {
     my $self = shift;
 
     $self->{count} and croak "start_testing() called after tests";
-    Test::Refute::Build::refute_engine_push( $self );
+    Test::Contract::Build::refute_engine_push( $self );
 
     return $self;
 };
@@ -252,7 +252,7 @@ sub done_testing {
 
     # engine cleanup MUST be called with true done flag.
     $self->{done}++;
-    Test::Refute::Build::refute_engine_cleanup();
+    Test::Contract::Build::refute_engine_cleanup();
     $self->on_done;
 
     return $self;
@@ -315,13 +315,13 @@ Expectations are currently supported in the only format:
 a string of 0's and 1's.
 More formats MAY follow in the future.
 
-See contract_is() in L<Test::Refute::Basic>.
+See contract_is() in L<Test::Contract::Basic>.
 
 Usage is like this:
 
     use strict;
     use warnings;
-    use Test::Refute;
+    use Test::Contract;
 
     # ...
     contract {
@@ -339,7 +339,7 @@ B<EXPERIMENTAL> Name and meaning MAY change in the future.
 =cut
 
 sub sign {
-    Test::Refute::Build::refute_engine()->contract_is( @_ );
+    Test::Contract::Build::refute_engine()->contract_is( @_ );
     return shift;
 };
 
@@ -350,7 +350,7 @@ sub DESTROY {
             carp "[$$]: on_done callback failed: $@";
         };
     };
-    Test::Refute::Build::refute_engine_cleanup();
+    Test::Contract::Build::refute_engine_cleanup();
 };
 
 =head1 GETTERS
@@ -438,7 +438,7 @@ sub get_failed {
 
 Get contract evaluation result as a multiline scalar.
 
-May NOT be available in subclasses (dies in C<Test::Refute::TAP>).
+May NOT be available in subclasses (dies in C<Test::Contract::Engine::TAP>).
 
 =cut
 

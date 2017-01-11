@@ -1,4 +1,4 @@
-package Test::Refute;
+package Test::Contract;
 
 use 5.006;
 use strict;
@@ -7,7 +7,7 @@ our $VERSION = 0.0204;
 
 =head1 NAME
 
-Test::Refute - a lightweight unit-testing and assertion tool.
+Test::Contract - a lightweight unit-testing and assertion tool.
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ The following is a prove-compatible test script. (See L<Test::More>).
 
     use strict;
     use warnings;
-    use Test::Refute;
+    use Test::Contract;
 
     use_ok( "My::Module" );
 
@@ -25,7 +25,7 @@ The following is a prove-compatible test script. (See L<Test::More>).
 
 However, it can also work inside an application:
 
-    use Test::Refute qw(contract);
+    use Test::Contract qw(contract);
 
     my $contract = contract {
         is ($user_input->{foo}, $bar, "Input as expected" );
@@ -37,8 +37,8 @@ However, it can also work inside an application:
 
 Or using the OO interface, if you prefer:
 
-    use Test::Refute::Contract;
-    my $contract = Test::Refute::Contract->new;
+    use Test::Contract::Engine;
+    my $contract = Test::Contract::Engine->new;
     $contract->like( $something, $something_else );
     $contract->done_testing; # this may be omitted
     if (!$contract->get_passed) {
@@ -56,7 +56,7 @@ conditions and optimizes itself out if needed. That's not done yet.
 Extending the test suite goes as follows:
 
     package My::Package;
-    use Test::Refute::Build;
+    use Test::Contract::Build;
     use parent qw(Exporter);
 
     build_refute is_everything => sub {
@@ -74,11 +74,11 @@ package, with C<args> positional parameters and an optional human-readable
 message. (Think "ok 1", "ok 1 'test passed'").
 
 It will also create a corresponding is_everything method in
-L<Test::Refute::Contract> package so that OO interface described above
+L<Test::Contract::Engine> package so that OO interface described above
 is always on par with functional one.
 This is the main reason to need a builder at all.
 Suggestions how to reduce it even more are welcome.
-See L<Test::Refute::Build>.
+See L<Test::Contract::Build>.
 
 =head1 EXPORT
 
@@ -90,17 +90,17 @@ All functions in this module are exported by default.
 
 use Carp;
 
-use Test::Refute::Build;
-use Test::Refute::Basic;
-use Test::Refute::Contract qw(contract);
-use Test::Refute::TAP;
-use Test::Refute::Deep;
+use Test::Contract::Build;
+use Test::Contract::Basic;
+use Test::Contract::Engine qw(contract);
+use Test::Contract::Engine::TAP;
+use Test::Contract::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest contract_is);
 my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
-our @EXPORT = (@own, @wrapper, @reexport, @Test::Refute::Basic::EXPORT);
+our @EXPORT = (@own, @wrapper, @reexport, @Test::Contract::Basic::EXPORT);
 my $main_engine;
 my $no_plan_seen;
 our $TODO; # unimplemented - use contract instead!
@@ -115,7 +115,7 @@ sub import {
         @_ = ($self, @rest);
     } else {
         # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
-        $main_engine ||= Test::Refute::TAP->new;
+        $main_engine ||= Test::Contract::Engine::TAP->new;
         $main_engine->start_testing;
     };
 
@@ -134,7 +134,7 @@ sub import {
 
 =head1 TESTS
 
-See L<Test::Refute::Basic> for checks allowed by default.
+See L<Test::Contract::Basic> for checks allowed by default.
 
 =head2 plan tests => nnn
 
@@ -292,16 +292,16 @@ foreach (@wrapper) {
 
 Run an enclosed set of tests, recording the results for future analysis.
 Returns a contract object.
-See GETTERS in L<Test::Refute::Contract> for reference.
+See GETTERS in L<Test::Contract::Engine> for reference.
 
 =cut
 
 =head2 MANAGEMENT
 
 These functions are not exported and should be called as
-normal methods, i.e. Test::Refute->func( args );
+normal methods, i.e. Test::Contract->func( args );
 
-=head2 Test::Refute->get_engine();
+=head2 Test::Contract->get_engine();
 
 Returns current default contract engine.
 
@@ -311,7 +311,7 @@ sub get_engine {
     return refute_engine();
 };
 
-=head2 Test::Refute->reset();
+=head2 Test::Contract->reset();
 
 If running in a test script, this resets the engine so that it doesn't pollute
 
@@ -333,14 +333,14 @@ Konstantin S. Uvarin, C<< <khedin at gmail.com> >>
 This is alpha software, lots of bugs guaranteed.
 
 Please report any bugs or feature requests to C<bug-test-refute at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Refute>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Contract>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Test::Refute
+    perldoc Test::Contract
 
 You can also look for information at:
 
@@ -348,19 +348,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Refute>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Contract>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Test-Refute>
+L<http://annocpan.org/dist/Test-Contract>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Test-Refute>
+L<http://cpanratings.perl.org/d/Test-Contract>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Test-Refute/>
+L<http://search.cpan.org/dist/Test-Contract/>
 
 =back
 
@@ -411,4 +411,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Test::Refute
+1; # End of Test::Contract

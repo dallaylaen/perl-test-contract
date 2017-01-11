@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Refute;
-use Test::Refute::Exception;
+use Test::Contract;
+use Test::Contract::Exception;
 
 note contract {
     local $INC{"No/Such/Module.pm"} = 1;

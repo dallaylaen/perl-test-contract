@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Refute;
+use Test::Contract;
 
 ok (1, "pass");
 subtest subt => sub {

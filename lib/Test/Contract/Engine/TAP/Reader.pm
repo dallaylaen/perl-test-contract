@@ -1,4 +1,4 @@
-package Test::Refute::Contract::TAP::Reader;
+package Test::Contract::Engine::TAP::Reader;
 
 use strict;
 use warnings;
@@ -6,11 +6,11 @@ our $VERSION = 0.0203;
 
 =head1 NAME
 
-Test::Refute::Contract::TAP::Reader - test anything protocol parser for Test::Refute
+Test::Contract::Engine::TAP::Reader - test anything protocol parser for Test::Contract
 
 =head1 DESCRIPTION
 
-This module is a L<Test::Refute::Contract> that, instead of executing
+This module is a L<Test::Contract::Engine> that, instead of executing
 tests, reads those from a TAP stream.
 
 Additional tests are performed on the recieving end (ok's in order, plan
@@ -21,7 +21,7 @@ present etc).
 =cut
 
 use Carp;
-use parent qw(Test::Refute::Contract);
+use parent qw(Test::Contract::Engine);
 
 =head2 new( in => $fd | exec => "command" | eval => sub { CODE; } )
 

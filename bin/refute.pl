@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package Test::Refute::bin; # avoid polluting main
+package Test::Contract::bin; # avoid polluting main
 
 use strict;
 use warnings;
@@ -10,11 +10,11 @@ use File::Basename qw(basename dirname);
 
 # Always use latest & greatest lib, if available
 use lib dirname(__FILE__)."/../lib";
-use Test::Refute qw(no_init);
-use Test::Refute::Contract;
-use Test::Refute::Contract::TAP::Reader;
+use Test::Contract qw(no_init);
+use Test::Contract::Engine;
+use Test::Contract::Engine::TAP::Reader;
 
-my $all = Test::Refute::TAP->new->start_testing;
+my $all = Test::Contract::Engine::TAP->new->start_testing;
 
 # make Getopt work with Perl-ish notation
 @ARGV = map { /(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
@@ -36,7 +36,7 @@ $0 [options] [test_dir] ...
 Options may include:
     -I - add a library path
     --preload Module::Name,Other::Module... - experimental module caching mode
-    --faketest (EXPERIMENTAL) - use Test::Refute in place of Test::More
+    --faketest (EXPERIMENTAL) - use Test::Contract in place of Test::More
     --help - this message
 This is ALPHA software, use prove(1) when in doubt.
 HELP
@@ -99,7 +99,7 @@ sub get_reader {
     my ($in, $pid);
 
     if (@preload) {
-        return Test::Refute::Contract::TAP::Reader->new (
+        return Test::Contract::Engine::TAP::Reader->new (
             indent => 1, replace_stdout => 1, eval => sub {
                 $0 = $f;
                 @ARGV = ();
@@ -124,7 +124,7 @@ sub get_reader {
         $line =~ /\s-T\b/ and push @localopt, "-T";
         close $peek;
 
-        return Test::Refute::Contract::TAP::Reader->new (
+        return Test::Contract::Engine::TAP::Reader->new (
             indent => 1, exec => [ perl => @plopt => @localopt => $f ] );
     };
 };

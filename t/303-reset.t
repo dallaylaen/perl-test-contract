@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-require Test::Refute;
-my $main = Test::Refute::TAP->new;
+require Test::Contract;
+my $main = Test::Contract::Engine::TAP->new;
 
 # At this point, real stdout is saved inside $main, so we can dispose of it
 $| = 1;
@@ -15,10 +15,10 @@ open STDOUT, ">&", $write
 
 my $default;
 do {
-    Test::Refute->import;
-    $default = Test::Refute->get_engine;
+    Test::Contract->import;
+    $default = Test::Contract->get_engine;
     ok(1);
-    Test::Refute->reset;
+    Test::Contract->reset;
     done_testing();
 };
 

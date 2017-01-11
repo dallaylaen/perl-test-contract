@@ -1,4 +1,4 @@
-package Test::Refute::Exception;
+package Test::Contract::Exception;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ our $VERSION = 0.0203;
 
 =head1 NAME
 
-Test::Refute::Exception - eval/die related plugin for Test::Refute
+Test::Contract::Exception - eval/die related plugin for Test::Contract
 
 =head1 DESCRIPTION
 
@@ -15,11 +15,11 @@ given code block.
 
 See also L<Test::Exception>. This one is MUCH simpler.
 
-See L<Test::Refute> for the general rules regarding tests, contracts, etc.
+See L<Test::Contract> for the general rules regarding tests, contracts, etc.
 
 =head1 SYNOPSIS
 
-    use Test::Refute;
+    use Test::Contract;
     use Test::Exception;
 
     use My::Module;
@@ -44,7 +44,7 @@ use Carp;
 use parent qw(Exporter);
 our @EXPORT = qw(dies lives_ok);
 
-use Test::Refute::Build qw(build_refute refute_engine);
+use Test::Contract::Build qw(build_refute refute_engine);
 
 =head2 dies { CODE; } qr/.../, "name";
 

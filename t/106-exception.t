@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Refute;
-use Test::Refute::Exception;
+use Test::Contract;
+use Test::Contract::Exception;
 
 my $out;
 $out = contract {

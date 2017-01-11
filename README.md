@@ -1,10 +1,10 @@
 # NAME
 
-Test::Refute - a unified extensible testing and assertion tool 
+Test::Contract - a unified extensible testing and assertion tool
 
 # DESCRIPTION
 
-`Test::Refute` is a drop-in replacement for `Test::More`.
+`Test::Contract` is a drop-in replacement for `Test::More`.
 It has some unique features, though:
 
 * can be used in production environment, without turning the whole application
@@ -31,22 +31,22 @@ building blocks.
 
 # SYNOPSIS
 
-`Test::Refute` may be used in place of Test::More, except for
+`Test::Contract` may be used in place of Test::More, except for
 TODO: and SKIP: blocks (yet).
 
-    use Test::Refute;
+    use Test::Contract;
     use_ok qw(My::Module);
 
     is (My::Module->answer, 42, "Life, universe, and everything");
 
     done_testing;
 
-Also, `Test::Refute::Contract` may be used in production code to verify
+Also, `Test::Contract::Engine` may be used in production code to verify
 that user input or a plugin module meet certain criteria:
 
-    use Test::Refute::Contract;
+    use Test::Contract::Engine;
 
-    my $c = Test::Refute::Contract->new;
+    my $c = Test::Contract::Engine->new;
     $c->like( $user_input, qr/.../, "Format as expected" );
     $c->isa_ok( $some_object, "Some::Class" );
     if ($c->is_valid) {
@@ -55,7 +55,7 @@ that user input or a plugin module meet certain criteria:
 
 Or get the best of both worlds with a declarative interface!
 
-    use Test::Refute qw(no_init);
+    use Test::Contract qw(no_init);
 
     my $c = contract {
         like   $user_input, qr/.../, "Format as expected";
@@ -76,7 +76,7 @@ A Build class is then used to plant the subroutine into the Contract class
 So this is a clumsy implementation of is()
 (a real one needs to check for undefs and quoting, though).
 
-    use Test::Refute::Build;
+    use Test::Contract::Build;
 
     build_refute my_is => sub {
         $_[0] eq $_[1] && "$_[0] != $_[1]";
@@ -86,7 +86,7 @@ And of course you can test it with the powerful `contract { ... }->sign(...)`
 construct:
 
     use My::Test;
-    use Test::Refute;
+    use Test::Contract;
 
     my $c = contract {
         my_is( 42, 42 );

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Refute;
+use Test::Contract;
 
 note contract {
     is 42, 42;
@@ -57,36 +57,36 @@ note contract {
 }->sign("10", "not_ok()")->get_tap;
 
 note contract {
-    isa_ok $_[0], "Test::Refute::Contract";
-    isa_ok $_[0], "Test::Refute::TAP";
-    isa_ok "Test::Refute::TAP", "Test::Refute::Contract";
-    isa_ok "Test::Refute::Contract", "Test::Refute::TAP";
-    isa_ok "Test::Refute::TAP", "Test::Refute::TAP";
-    isa_ok "No::Such::Package", "Test::Refute::TAP";
-    isa_ok "Test::Refute::TAP", "No::Such::Package";
+    isa_ok $_[0], "Test::Contract::Engine";
+    isa_ok $_[0], "Test::Contract::Engine::TAP";
+    isa_ok "Test::Contract::Engine::TAP", "Test::Contract::Engine";
+    isa_ok "Test::Contract::Engine", "Test::Contract::Engine::TAP";
+    isa_ok "Test::Contract::Engine::TAP", "Test::Contract::Engine::TAP";
+    isa_ok "No::Such::Package", "Test::Contract::Engine::TAP";
+    isa_ok "Test::Contract::Engine::TAP", "No::Such::Package";
     isa_ok "No::Such::Package", "No::Such::Package";
 }->sign("10101000", "isa_ok()")->get_tap;
 
 note contract {
     can_ok $_[0], "can_ok";
     can_ok $_[0], "frobnicate";
-    can_ok "Test::Refute", "import", "can_ok";
-    can_ok "Test::Refute", "unknown_subroutine";
+    can_ok "Test::Contract", "import", "can_ok";
+    can_ok "Test::Contract", "unknown_subroutine";
     can_ok "No::Exist", "can", "isa", "import";
 }->sign("10100", "can_ok()")->get_tap;
 
 note contract {
-    new_ok "Test::Refute::Contract";
-    new_ok "Test::Refute::Contract", [indent => 1];
-    new_ok "Test::Refute::Contract", [indent => 1], "Test::Refute::TAP";
-    new_ok "Test::Refute::TAP", [indent => 1], "Test::Refute::Contract";
+    new_ok "Test::Contract::Engine";
+    new_ok "Test::Contract::Engine", [indent => 1];
+    new_ok "Test::Contract::Engine", [indent => 1], "Test::Contract::Engine::TAP";
+    new_ok "Test::Contract::Engine::TAP", [indent => 1], "Test::Contract::Engine";
     new_ok "No::Such::Package";
     new_ok $_[0], [indent => 1];
     new_ok undef;
 }->sign("1101010", "new_ok()")->get_tap;
 
 note contract {
-    require_ok "Test::Refute";
+    require_ok "Test::Contract";
     require_ok "No::Such::Package::_______::000";
 }->sign("10", "require_ok")->get_tap;
 
