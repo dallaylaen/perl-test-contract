@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -93,7 +93,6 @@ use Carp;
 use Test::Contract::Build;
 use Test::Contract::Basic;
 use Test::Contract::Engine qw(contract);
-use Test::Contract::Engine::TAP;
 use Test::Contract::Deep;
 
 use parent qw(Exporter);
@@ -106,6 +105,15 @@ my $no_plan_seen;
 our $TODO; # unimplemented - use contract instead!
 
 # FIXME Have to make ugly hacks for Test::More compatibility
+our $More = Test::More->can("ok") ? 1 : 0;
+
+if ($More) {
+    our @EXPORT_OK = @EXPORT;
+    @EXPORT = qw(contract contract_is not_ok);
+    require Test::Contract::Engine::More;
+} else {
+    require Test::Contract::Engine::TAP;
+};
 
 sub import {
     my ($self, $t, @rest) = @_;
@@ -115,7 +123,9 @@ sub import {
         @_ = ($self, @rest);
     } else {
         # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
-        $main_engine ||= Test::Contract::Engine::TAP->new;
+        $main_engine ||= $More
+            ? Test::Contract::Engine::More->new
+            : Test::Contract::Engine::TAP->new;
         $main_engine->start_testing;
     };
 
