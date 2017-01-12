@@ -2,7 +2,7 @@ package Test::Contract::Tempfile;
 
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -112,7 +112,7 @@ sub _register {
     my ($self, $contract) = @_;
     $contract->set_done_callback( sub {
         my $c = shift;
-        if ($c->is_done and $c->get_passed) {
+        if ($c->get_finished and $c->get_passed) {
             $self->cleanup;
         } else {
             my @files = map { "'$_'" } keys %${ $self->{files} };

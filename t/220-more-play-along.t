@@ -26,6 +26,9 @@ fork_is {
     } );
 
     contract_is( $c, "01", "T::C specific" );
+    my $main = Test::Contract->get_engine;
+    $main->diag("diag something");
+    $main->note("note something");
 
     ok (0, "Add some failing test" );
 
@@ -33,6 +36,8 @@ fork_is {
 } <<"EOF";
 ok 1 - All good so far
 ok 2 - T::C specific
+# diag something
+# note something
 not ok 3 - Add some failing test
 # Failed test 'Add some failing test'
 # at FILE line NNN.

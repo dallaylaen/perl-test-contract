@@ -2,7 +2,7 @@ package Test::Contract::Engine::More;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -21,12 +21,26 @@ use parent qw(Test::Contract::Engine);
 
 sub _NEWOPTIONS { return __PACKAGE__->SUPER::_NEWOPTIONS, qw(test_builder) };
 
+=head2 new( %options )
+
+Options may include:
+
+test_builder - a custom Test::Builder object or its substitute.
+
+=cut
+
 sub new {
     my ($class, %opt) = @_;
 
     $opt{test_builder} ||= Test::Builder->new;
     return $class->SUPER::new(%opt);
 };
+
+=head2 refute( $condition, $message )
+
+See L<Test::Contract::Engine>. This is L<Test::Builder>-based implementation.
+
+=cut
 
 sub refute {
     my ($self, $cond, $mess) = @_;
@@ -45,6 +59,10 @@ sub refute {
     };
 };
 
+=head2 diag
+
+=cut
+
 sub diag {
     my ($self, @mess) = @_;
 
@@ -53,6 +71,12 @@ sub diag {
     );
 };
 
+=head2 note
+
+Both copy-pasted from parent, with Test::Builder added inside.
+
+=cut
+
 sub note {
     my ($self, @mess) = @_;
 
@@ -60,6 +84,12 @@ sub note {
         map { defined $_ && !ref $_ ? $_ : to_scalar($_); } @mess
     );
 };
+
+=head2 bail_out
+
+Goto BAIL_OUT.
+
+=cut
 
 sub bail_out {
     my ($self, $reason) = @_;

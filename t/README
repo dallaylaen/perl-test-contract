@@ -5,5 +5,5 @@
 3xx - API leftovers
 4xx - optional/extra test conditions
 
-Test::Contract::Basic::Is and Test::Contract::Engine::TAP
+Test::Contract::Basic and Test::Contract::Engine::TAP
     SHOULD have 100% coverage.
