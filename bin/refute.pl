@@ -72,7 +72,7 @@ foreach my $f (@files) {
     my $tap = get_reader( $f );
     # TODO parallel??
     $tap->finish;
-    not_ok !$tap->get_passed && $tap, $f;
+    not_ok !$tap->get_passing && $tap, $f;
 };
 
 my $failed = $all->get_failed;
@@ -90,7 +90,7 @@ if ($failed) {
     print "RESULT: PASS\n";
 };
 
-exit !$all->get_passed;
+exit !$all->get_passing;
 
 # TODO move this into TAP::Reader after all
 sub get_reader {

@@ -43,14 +43,14 @@ print "# Testing TAP backend\n";
 $c = capture( \$output );
 $c->done_testing;
 my_is ($output, "1..0\n", "empty plan");
-my_is (!!$c->get_passed, 1, "contract valid");
+my_is (!!$c->get_passing, 1, "contract valid");
 my_is ($c->get_count, 0, "no tests run");
 
 $c = capture( \$output );
 $c->ok( 1, "Pass" );
 $c->done_testing;
 my_is ($output, "ok 1 - Pass\n1..1\n", "happy path");
-my_is (!!$c->get_passed, 1, "contract valid");
+my_is (!!$c->get_passing, 1, "contract valid");
 my_is ($c->get_count, 1, "1 test run");
 
 $c = capture( \$output );
@@ -58,7 +58,7 @@ $c->ok( 1, "Pass" );
 $c->ok( 0, "Fail" );
 $c->done_testing;
 my_is strip($output), "ok 1 - Pass\nnot ok 2 - Fail\n1..2\n", "Failed ok()";
-my_is (!$c->get_passed, 1, "contract NOT valid");
+my_is (!$c->get_passing, 1, "contract NOT valid");
 my_is ($c->get_count, 2, "1 test run");
 
 # OK, this is a fragile hack. We know that TAP driver doesn't save passed tests
@@ -72,7 +72,7 @@ $c = capture( \$output );
 $c->ok( 1, "Pass" );
 $c->bail_out( "Reason" );
 my_is strip($output), "ok 1 - Pass\nBail out! Reason\n", "Bail out";
-my_is (!$c->get_passed, 1, "contract NOT valid");
+my_is (!$c->get_passing, 1, "contract NOT valid");
 my_is ($c->get_count, 1, "1 test run");
 
 $c = capture( \$output );
@@ -91,7 +91,7 @@ $c = contract {
 my_is ref $c, "Test::Contract::Engine", "contract yields T::R::Contract";
 my_is $c->get_count, 0, "Nothing done";
 my_is $c->get_error_count, 0, "No errors";
-my_is !$c->get_passed, "", "valid = true";
+my_is !$c->get_passing, "", "valid = true";
 my_is $c->get_tap(0), "1..0\n", "plan 1..0";
 
 $c = contract {
@@ -101,7 +101,7 @@ $c = contract {
 my_is ref $c, "Test::Contract::Engine", "(2) contract yields T::R::Contract";
 my_is $c->get_count, 2, "count = 2";
 my_is $c->get_error_count, 1, "error = 1";
-my_is !$c->get_passed, 1, "valid = false";
+my_is !$c->get_passing, 1, "valid = false";
 my_is $c->get_tap(0), "ok 1 - pass\nnot ok 2 - fail\n1..2\n"
     , "output as expected in get_tap";
 

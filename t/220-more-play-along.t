@@ -48,7 +48,7 @@ EOF
 
 
 $tap->done_testing;
-exit !$tap->get_passed;
+exit !$tap->get_passing;
 
 sub fork_is (&@){ ## no critic
     my ($code, $exp) = @_;

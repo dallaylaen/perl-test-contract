@@ -28,7 +28,7 @@ sysread $read, my $output, 4096
     or die "failed to read self pipe: $!";
 
 $main->is( $output, "ok 1\n", "done_testing was not seen" );
-$main->ok( $default->get_finished, "but it WAS executed" );
+$main->ok( $default->get_done, "but it WAS executed" );
 $main->is( $default->get_skipped, "reset called", "Skip recorded" );
 $main->done_testing;
-exit !$main->get_passed;
+exit !$main->get_passing;

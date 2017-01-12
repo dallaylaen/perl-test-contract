@@ -2,7 +2,7 @@ package Test::Contract::Engine::TAP::Reader;
 
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -143,15 +143,15 @@ sub eof {
     $self->done_testing;
 };
 
-=head2 get_passed
+=head2 get_passing
 
-get_passed includes additional checks.
+get_passing includes additional checks.
 
 =cut
 
-sub get_passed {
+sub get_passing {
     my $self = shift;
-    return $self->SUPER::get_passed
+    return $self->SUPER::get_passing
         && !$self->{order}
         && defined $self->{plan}
         ;

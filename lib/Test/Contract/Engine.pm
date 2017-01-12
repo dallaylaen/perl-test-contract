@@ -2,7 +2,7 @@ package Test::Contract::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ Test::Contract::Engine - apply a series of tests/assertions within an applicatio
         my $contract = Test::Contract::Engine->new;
         $contract->is( $user_data->answer, 42, "Life and everything" );
         $contract->done_testing;
-        if ($contract->get_passed) {
+        if ($contract->get_passing) {
             ...
         };
     };
@@ -58,7 +58,7 @@ These two are equivalent:
     my $contract = contract {
         is $foo, $baf, "foobar";
     };
-    if ($contract->get_passed) {
+    if ($contract->get_passing) {
         ...
     };
 
@@ -70,7 +70,7 @@ And
         my $c = shift;
         $c->is( $foo, $bar, "foobar" );
     };
-    if ($contract->get_passed) {
+    if ($contract->get_passing) {
         ...
     };
 
@@ -84,7 +84,7 @@ sub contract (&;$) { ## no critic # need block function
 
     $code->($engine);
     $engine->done_testing
-        unless $engine->get_finished;
+        unless $engine->get_done;
     return $engine;
 };
 
@@ -182,7 +182,7 @@ sub start_testing {
     my $self = shift;
 
     $self->{count} and croak "start_testing() called after tests";
-    Test::Contract::Build::refute_engine_push( $self );
+    Test::Contract::Build::contract_engine_push( $self );
 
     return $self;
 };
@@ -213,7 +213,7 @@ reason must be true, or this won't work!
 
 sub skip_all {
     my ($self, $reason) = @_;
-    return if $self->get_finished;
+    return if $self->get_done;
     $self->{skip_all} ||= $reason || 'unknown reason';
 };
 
@@ -252,7 +252,7 @@ sub done_testing {
 
     # engine cleanup MUST be called with true done flag.
     $self->{done}++;
-    Test::Contract::Build::refute_engine_cleanup();
+    Test::Contract::Build::contract_engine_cleanup();
     $self->on_done;
 
     return $self;
@@ -339,7 +339,7 @@ B<EXPERIMENTAL> Name and meaning MAY change in the future.
 =cut
 
 sub sign {
-    Test::Contract::Build::refute_engine()->contract_is( @_ );
+    Test::Contract::Build::contract_engine()->contract_is( @_ );
     return shift;
 };
 
@@ -350,18 +350,18 @@ sub DESTROY {
             carp "[$$]: on_done callback failed: $@";
         };
     };
-    Test::Contract::Build::refute_engine_cleanup();
+    Test::Contract::Build::contract_engine_cleanup();
 };
 
 =head1 GETTERS
 
-=head2 get_finished
+=head2 get_done
 
 Return truth if testing is finished.
 
 =cut
 
-sub get_finished {
+sub get_done {
     my $self = shift;
 
     return $self->{done};
@@ -378,7 +378,7 @@ B<EXPERIMENTAL> Logic is not obvious.
 sub get_plan {
     my $self = shift;
 
-    return $self->{plan} || ($self->get_finished && $self->get_count);
+    return $self->{plan} || ($self->get_done && $self->get_count);
 };
 
 =head2 get_skipped
@@ -401,13 +401,13 @@ sub get_count {
     return $self->{count} || 0;
 };
 
-=head2 get_passed
+=head2 get_passing
 
 Returns truth if no tests failed so far.
 
 =cut
 
-sub get_passed {
+sub get_passing {
     my $self = shift;
     return !$self->{fails} && !$self->{bail_out};
 };
@@ -560,7 +560,7 @@ sub diag {
 
     #
     croak "diag(): Testing finished"
-        if $self->get_finished;
+        if $self->get_done;
     $self->_log( join " ", "#", $_ )
         for split /\n+/, join "",
             map { defined $_ && !ref $_ ? $_ : to_scalar($_); } @mess;

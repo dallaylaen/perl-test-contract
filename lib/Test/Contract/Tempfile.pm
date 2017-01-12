@@ -2,7 +2,7 @@ package Test::Contract::Tempfile;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -43,7 +43,7 @@ sub mktemp {
 sub new {
     my ($class, %opt) = @_;
 
-    $opt{contract} ||= refute_engine
+    $opt{contract} ||= contract_engine
         or croak "$class->new: contract option is required and must be a Test::Contract::Engine";
 
     my $self = bless { contract => $opt{contract} }, $class;
@@ -112,7 +112,7 @@ sub _register {
     my ($self, $contract) = @_;
     $contract->set_done_callback( sub {
         my $c = shift;
-        if ($c->get_finished and $c->get_passed) {
+        if ($c->get_done and $c->get_passing) {
             $self->cleanup;
         } else {
             my @files = map { "'$_'" } keys %${ $self->{files} };

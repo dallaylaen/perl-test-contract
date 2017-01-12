@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ However, it can also work inside an application:
         is ($user_input->{foo}, $bar, "Input as expected" );
         like ($user_input->{baz}, qr/f?o?r?m?a?t?/, "Format good" );
     };
-    if (!$contract->get_passed) {
+    if (!$contract->get_passing) {
         ...
     };
 
@@ -41,7 +41,7 @@ Or using the OO interface, if you prefer:
     my $contract = Test::Contract::Engine->new;
     $contract->like( $something, $something_else );
     $contract->done_testing; # this may be omitted
-    if (!$contract->get_passed) {
+    if (!$contract->get_passing) {
         ...
     };
 
@@ -170,8 +170,8 @@ sub plan($$) { ## no critic
         croak( "plan(): only (tests => nnn) or (skip_all => reason) args supported" );
     };
 
-    refute_engine->$todo( $arg );
-    if (refute_engine eq $main_engine and $todo eq 'skip_all') {
+    contract_engine->$todo( $arg );
+    if (contract_engine eq $main_engine and $todo eq 'skip_all') {
         exit 0; # Yuuuurgh - Test::More compat :(
     };
 };
@@ -227,7 +227,7 @@ frontend to refute().
 =cut
 
 sub not_ok {
-    refute_engine->refute(@_);
+    contract_engine->refute(@_);
 };
 
 =head2 contract_is $contract_object, "100101", "explanation"
@@ -267,7 +267,7 @@ END {
             unless $main_engine->get_plan or $no_plan_seen;
 
         $main_engine->done_testing
-            unless $main_engine->get_finished;
+            unless $main_engine->get_done;
 
         my $ret = $main_engine->get_error_count;
         $ret = 100 if $ret > 100;
@@ -275,7 +275,7 @@ END {
     }
     elsif ($main_engine and $main_engine->get_skipped) {
         $main_engine->done_testing
-            unless $main_engine->get_finished;
+            unless $main_engine->get_done;
     };
 };
 
@@ -284,7 +284,7 @@ foreach (@wrapper) {
     my $name = $_;
 
     my $code = sub (@) { ## no critic
-        refute_engine->$name(@_);
+        contract_engine->$name(@_);
     };
 
     no strict 'refs'; ## no critic
@@ -318,7 +318,7 @@ Returns current default contract engine.
 =cut
 
 sub get_engine {
-    return refute_engine();
+    return contract_engine();
 };
 
 =head2 Test::Contract->reset();

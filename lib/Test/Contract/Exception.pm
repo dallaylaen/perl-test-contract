@@ -2,7 +2,7 @@ package Test::Contract::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ use Carp;
 use parent qw(Exporter);
 our @EXPORT = qw(dies lives_ok);
 
-use Test::Contract::Build qw(build_refute refute_engine);
+use Test::Contract::Build qw(build_refute contract_engine);
 
 =head2 dies { CODE; } qr/.../, "name";
 
@@ -70,7 +70,7 @@ build_refute dies => sub {
 }, args => 2, no_create => 1;
 
 sub dies (&@) { ## no critic # need block function
-    refute_engine->dies(@_);
+    contract_engine->dies(@_);
 };
 
 =head2 lives_ok { CODE; } "name";
@@ -90,7 +90,7 @@ build_refute lives_ok => sub {
 }, args => 1, no_create => 1;
 
 sub lives_ok (&@) { ## no critic # need block function
-    refute_engine->lives_ok(@_);
+    contract_engine->lives_ok(@_);
 };
 
 1;

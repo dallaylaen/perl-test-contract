@@ -2,7 +2,7 @@ package Test::Contract::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0203;
+our $VERSION = 0.0204;
 
 =head1 NAME
 
@@ -64,8 +64,8 @@ All functions are exportable.
 use Carp;
 use Scalar::Util qw(weaken blessed set_prototype looks_like_number refaddr);
 use parent qw(Exporter);
-our @EXPORT = qw(build_refute refute_engine to_scalar);
-our @EXPORT_OK = qw(refute_engine_push refute_engine_cleanup);
+our @EXPORT = qw(build_refute contract_engine to_scalar);
+our @EXPORT_OK = qw(contract_engine_push contract_engine_cleanup);
 
 =head2 build_refute name => CODE, %options
 
@@ -116,7 +116,7 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
     };
     my $wrapper = sub {
         my $message; $message = pop unless @_ <= $nargs;
-        return refute_engine()->refute( scalar $cond->(@_), $message );
+        return contract_engine()->refute( scalar $cond->(@_), $message );
     };
     # '&' for set_proto to work on a scalar, not {CODE;}
     &set_prototype( $wrapper, '$' x $opt{args} . ';$' )
@@ -151,7 +151,7 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
     return 1;
 };
 
-=head2 refute_engine
+=head2 contract_engine
 
 Returns current default engine, dies if none right now.
 
@@ -159,12 +159,12 @@ Returns current default engine, dies if none right now.
 
 my @stack;
 
-sub refute_engine() { ## no critic
+sub contract_engine() { ## no critic
     @stack or croak [caller]->[3]."(): Not currently testing anything";
     return $stack[-1];
 };
 
-=head2 refute_engine_push( $contract )
+=head2 contract_engine_push( $contract )
 
 Make C<$contract> the default engine until it's detroyed, or done_testing is
 called. This is useful for stuff like subtests.
@@ -182,16 +182,16 @@ Not exported by default.
 
 =cut
 
-sub refute_engine_push {
+sub contract_engine_push {
     my $eng = shift;
     blessed $eng and $eng->isa( "Test::Contract::Engine" )
-        or croak( "refute_engine_push(): won't load anything but Test::Contract::Engine" );
+        or croak( "contract_engine_push(): won't load anything but Test::Contract::Engine" );
     push @stack, $eng;
     weaken $stack[-1];
     return scalar @stack;
 };
 
-=head2 refute_engine_cleanup
+=head2 contract_engine_cleanup
 
 Remove all finished contracts from engine stack.
 This is called by both C<done_testing> and contract's destructor.
@@ -203,8 +203,8 @@ Not exported by default.
 
 =cut
 
-sub refute_engine_cleanup {
-    while (@stack and (!$stack[-1] or $stack[-1]->get_finished)) {
+sub contract_engine_cleanup {
+    while (@stack and (!$stack[-1] or $stack[-1]->get_done)) {
         pop @stack;
     };
     return scalar @stack;
