@@ -2,7 +2,7 @@ package Test::Contract::Engine::More;
 
 use strict;
 use warnings;
-our $VERSION = 0.0207;
+our $VERSION = 0.0208;
 
 =head1 NAME
 
@@ -95,6 +95,58 @@ sub bail_out {
     my ($self, $reason) = @_;
 
     $self->{test_builder}->BAIL_OUT( $reason );
+};
+
+=head1 GETTERS
+
+=head2 get_passing
+
+=head2 get_count
+
+=head2 get_error_count
+
+=cut
+
+sub get_passing {
+    my $self = shift;
+    return $self->{test_builder}->is_passing;
+};
+
+sub get_count {
+    my $self = shift;
+    return $self->{test_builder}->current_test;
+};
+
+sub get_error_count {
+    my $self = shift;
+    return scalar keys %{ $self->get_failed };
+};
+
+=head2 get_failed
+
+Is a stub so far... Only numbers retained.
+
+=cut
+
+sub get_failed {
+    my $self = shift;
+    my %hash;
+
+    my @summary = $self->{test_builder}->summary;
+    for (my $i = 0; $i<@summary; $i++) {
+        $hash{$i+1}++ unless $summary[$i];
+    };
+    return \%hash;
+};
+
+=head2 get_done
+
+Stub since Test::Builder has no way to tell.
+
+=cut
+
+sub get_done {
+    return 0;
 };
 
 1;

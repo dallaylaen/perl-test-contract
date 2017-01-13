@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0206;
+our $VERSION = 0.0207;
 
 =head1 NAME
 
@@ -262,20 +262,22 @@ sub skip(@) { ## no critic
 };
 
 END {
-    if ($main_engine and $main_engine->get_count) {
-        croak "[$$] done_testing was not seen"
-            unless $main_engine->get_plan or $no_plan_seen;
+    if (!$More and $main_engine) {
+        if ($main_engine->get_count) {
+            croak "[$$] done_testing was not seen"
+                unless $main_engine->get_plan or $no_plan_seen;
 
-        $main_engine->done_testing
-            unless $main_engine->get_done;
+            $main_engine->done_testing
+                unless $main_engine->get_done;
 
-        my $ret = $main_engine->get_error_count;
-        $ret = 100 if $ret > 100;
-        $? = $ret;
-    }
-    elsif ($main_engine and $main_engine->get_skipped) {
-        $main_engine->done_testing
-            unless $main_engine->get_done;
+            my $ret = $main_engine->get_error_count;
+            $ret = 100 if $ret > 100;
+            $? = $ret;
+        }
+        elsif ($main_engine->get_skipped) {
+            $main_engine->done_testing
+                unless $main_engine->get_done;
+        };
     };
 };
 
@@ -311,15 +313,14 @@ See GETTERS in L<Test::Contract::Engine> for reference.
 These functions are not exported and should be called as
 normal methods, i.e. Test::Contract->func( args );
 
-=head2 Test::Contract->get_engine();
+=head2 Test::Contract->engine();
 
 Returns current default contract engine.
 
 =cut
 
-sub get_engine {
-    return contract_engine();
-};
+# HACK Avoid 'once' warning
+*engine = *engine = \&contract_engine;
 
 =head2 Test::Contract->reset();
 

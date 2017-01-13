@@ -16,7 +16,7 @@ open STDOUT, ">&", $write
 my $default;
 do {
     Test::Contract->import;
-    $default = Test::Contract->get_engine;
+    $default = Test::Contract->engine;
     ok(1);
     Test::Contract->reset;
     done_testing();

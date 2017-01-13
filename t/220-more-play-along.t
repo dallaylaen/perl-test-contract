@@ -26,7 +26,7 @@ fork_is {
     } );
 
     contract_is( $c, "01", "T::C specific" );
-    my $main = Test::Contract->get_engine;
+    my $main = Test::Contract->engine;
     $main->diag("diag something");
     $main->note("note something");
 
@@ -40,12 +40,48 @@ ok 2 - T::C specific
 # note something
 not ok 3 - Add some failing test
 # Failed test 'Add some failing test'
-# at FILE line NNN.
+# at FILE line NNN
 1..3
-# Looks like you failed 1 test of 3.
+# Looks like you failed 1 test of 3
 EOF
 
+fork_is {
+    # Need to die on redefines. No, just fatal warns won't cut it.
+    local $SIG{__WARN__} = \&Carp::confess;
 
+    # Use by hand
+    require Test::More;
+    Test::More->import();
+    require Test::Contract;
+    Test::Contract->import();
+
+    ok (1, "pass" );
+    my $c = Test::Contract->engine;
+
+    note( "count=", $c->get_count );
+    note( "error=", $c->get_error_count );
+    note( "passing=", $c->get_passing ? 1 : 0 );
+
+    ok (0, "fail");
+    note( "count=", $c->get_count );
+    note( "error=", $c->get_error_count );
+    note( "passing=", $c->get_passing ? 1 : 0 );
+
+    done_testing();
+} <<"EOF";
+ok 1 - pass
+# count=1
+# error=0
+# passing=1
+not ok 2 - fail
+# Failed test 'fail'
+# at FILE line NNN
+# count=2
+# error=1
+# passing=0
+1..2
+# Looks like you failed 1 test of 2
+EOF
 
 $tap->done_testing;
 exit !$tap->get_passing;
@@ -78,5 +114,6 @@ sub fork_is (&@){ ## no critic
     $data =~ s/(at.*?line)\s+\d+/at FILE line NNN/g;
     $data =~ s/  +/ /g;
     $data =~ s/\n\n+/\n/gs;
+    $data =~ s/\.$//gm;
     $tap->is ($data, $exp, "fork_is");
 };
