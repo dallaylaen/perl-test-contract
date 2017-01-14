@@ -2,7 +2,7 @@ package Test::Contract::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -105,6 +105,7 @@ sub new {
     my $new;
     $new->{$_} = $opt{$_} for $class->_NEWOPTIONS;
     $new->{indent} ||= 0;
+    $new->{plan}   ||= 0;
     return bless $new, $class;
 };
 
@@ -196,8 +197,8 @@ Commit to performing exactly n tests. This would die if testing had started.
 sub plan {
     my ($self, $n) = @_;
 
-    croak "plan(): argument must be numeric"
-        unless $n =~ /^\d+$/;
+    croak "plan(): argument must be numeric, not $n"
+        unless $n =~ /^-?\d+$/;
     croak "plan(): testing already started"
         if $self->get_count;
 
@@ -243,7 +244,7 @@ sub done_testing {
 
     $self->{done} and croak "done_testing() called twice";
 
-    if ($self->{plan} and !$self->{skip_all} and $self->{plan} != $self->get_count) {
+    if ($self->{plan} and !$self->{skip_all} and $self->{plan} > 0 and $self->{plan} != $self->get_count) {
         $self->refute(
             sprintf( "made %d/%d tests", $self->get_count, $self->{plan} )
             , "plan failed!"

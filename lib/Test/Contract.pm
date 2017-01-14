@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0207;
+our $VERSION = 0.0208;
 
 =head1 NAME
 
@@ -100,8 +100,6 @@ my @wrapper = qw(done_testing note diag bail_out subtest contract_is);
 my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Contract::Basic::EXPORT);
-my $main_engine;
-my $no_plan_seen;
 our $TODO; # unimplemented - use contract instead!
 
 # FIXME Have to make ugly hacks for Test::More compatibility
@@ -122,11 +120,7 @@ sub import {
     if ($t and $t eq 'no_init') {
         @_ = ($self, @rest);
     } else {
-        # Set up global testing engine FIRST, but ONLY once and ONLY if use'd
-        $main_engine ||= $More
-            ? Test::Contract::Engine::More->new
-            : Test::Contract::Engine::TAP->new;
-        $main_engine->start_testing;
+        Test::Contract::Build->contract_engine_init;
     };
 
     if ($t and $t eq 'tests') {
@@ -136,7 +130,7 @@ sub import {
     elsif( $t and $t eq 'no_plan') {
         carp "DEPRECATED. put a done_testing(); at the end of the script and remove 'no_plan'";
         @_ = ($self, @rest);
-        $no_plan_seen++;
+        plan( "no_plan" );
     };
 
     goto &Exporter::import; ## no critic
@@ -163,7 +157,11 @@ Skip all tests.
 sub plan($$) { ## no critic
     my ($todo, $arg) = @_;
 
-    if ($todo eq 'tests') {
+    if ($todo eq 'no_plan') {
+        $todo = 'plan';
+        $arg = -1;
+    }
+    elsif ($todo eq 'tests') {
         $todo = 'plan';
     }
     elsif( $todo ne 'skip_all' ) {
@@ -171,9 +169,6 @@ sub plan($$) { ## no critic
     };
 
     contract_engine->$todo( $arg );
-    if (contract_engine eq $main_engine and $todo eq 'skip_all') {
-        exit 0; # Yuuuurgh - Test::More compat :(
-    };
 };
 
 =head2 diag( $text )
@@ -261,25 +256,6 @@ sub skip(@) { ## no critic
     carp "skip(): UNIMPLEMENTED. Use simple if() instead.";
 };
 
-END {
-    if (!$More and $main_engine) {
-        if ($main_engine->get_count) {
-            croak "[$$] done_testing was not seen"
-                unless $main_engine->get_plan or $no_plan_seen;
-
-            $main_engine->done_testing
-                unless $main_engine->get_done;
-
-            my $ret = $main_engine->get_error_count;
-            $ret = 100 if $ret > 100;
-            $? = $ret;
-        }
-        elsif ($main_engine->get_skipped) {
-            $main_engine->done_testing
-                unless $main_engine->get_done;
-        };
-    };
-};
 
 # Setup wrapper functions - really proxy to the current contract
 foreach (@wrapper) {
@@ -321,19 +297,6 @@ Returns current default contract engine.
 
 # HACK Avoid 'once' warning
 *engine = *engine = \&contract_engine;
-
-=head2 Test::Contract->reset();
-
-If running in a test script, this resets the engine so that it doesn't pollute
-
-=cut
-
-sub reset {
-    if ($main_engine) {
-        $main_engine->set_mute("reset called");
-        undef $main_engine;
-    };
-};
 
 =head1 AUTHOR
 

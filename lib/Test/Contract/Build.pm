@@ -2,7 +2,7 @@ package Test::Contract::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -251,5 +251,53 @@ sub to_scalar {
     return sprintf "%s/%x", ref $data, refaddr $data;
 };
 
+=head2 contract_engine_init
+
+Start default testing engine if run from within a test script.
+The engine will be created just once and put on top of the stack.
+
+This should be called from custom modules to be able to interact
+with Test::More.
+
+=cut
+
+my $main_engine;
+my $main_pid;
+
+sub contract_engine_init {
+    return if $main_engine;
+
+    if (Test::Builder->can("ok")) {
+        require Test::Contract::Engine::More;
+        $main_engine = Test::Contract::Engine::More->new;
+    } else {
+        require Test::Contract::Engine::TAP;
+        $main_engine = Test::Contract::Engine::TAP->new;
+    };
+    $main_engine->start_testing;
+    $main_pid = $$;
+};
+
+END {
+    if ($main_engine and $main_engine->isa("Test::Contract::Engine::TAP") and $main_pid == $$) {
+        carp "Test::More loaded by accident, but Test::Refute is not in compat mode!"
+            if Test::Builder->can("ok");
+        if ($main_engine->get_count) {
+            croak "[$$] done_testing was not seen"
+                unless $main_engine->get_plan;
+
+            $main_engine->done_testing
+                unless $main_engine->get_done;
+
+            my $ret = $main_engine->get_error_count;
+            $ret = 100 if $ret > 100;
+            $? = $ret;
+        }
+        elsif ($main_engine->get_skipped) {
+            $main_engine->done_testing
+                unless $main_engine->get_done;
+        };
+    };
+};
 
 1;
