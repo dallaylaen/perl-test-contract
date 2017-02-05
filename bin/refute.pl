@@ -10,8 +10,8 @@ use File::Basename qw(basename dirname);
 
 # Always use latest & greatest lib, if available
 use lib dirname(__FILE__)."/../lib";
-use Test::Contract qw(no_init);
-use Test::Contract::Engine;
+use Test::Contract;
+use Test::Contract::Engine::TAP;
 use Test::Contract::Engine::TAP::Reader;
 
 my $all = Test::Contract::Engine::TAP->new->start_testing;

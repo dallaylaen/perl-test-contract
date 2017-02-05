@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract;
+use Test::Contract q(no_plan);
 use Test::Contract::Engine::TAP::Reader;
 
 pipe( my $read, my $write )

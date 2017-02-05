@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract;
+use Test::Contract q(no_plan);
 
 ok (1, "pass");
 subtest subt => sub {

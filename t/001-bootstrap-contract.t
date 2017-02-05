@@ -131,7 +131,7 @@ if (!$pid) {
     open STDOUT, ">&", $pipe_w;
     close $pipe_r;
     require Test::Contract;
-    Test::Contract->import;
+    Test::Contract->import( "no_plan" );
     is (42, 43, "fail");
     like (42, qr/\d+/, "pass");
     new_ok( "Test::Contract::Engine" ); # ok, too

@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0208;
+our $VERSION = 0.0209;
 
 =head1 NAME
 
@@ -102,35 +102,32 @@ my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Contract::Basic::EXPORT);
 our $TODO; # unimplemented - use contract instead!
 
-# FIXME Have to make ugly hacks for Test::More compatibility
+# FIXME Have to use ugly hacks for Test::More compatibility
+# If More is loaded, avoid exporting anything non-unique by default
 our $More = Test::More->can("ok") ? 1 : 0;
-
 if ($More) {
     our @EXPORT_OK = @EXPORT;
     @EXPORT = qw(contract contract_is not_ok);
-    require Test::Contract::Engine::More;
-} else {
-    require Test::Contract::Engine::TAP;
 };
 
+our $Fake; # See fake_lib/Test/More.pm
 sub import {
     my ($self, $t, @rest) = @_;
 
-    # TODO optimize branching here
-    if ($t and $t eq 'no_init') {
-        @_ = ($self, @rest);
-    } else {
-        Test::Contract::Build->contract_engine_init;
-    };
-
+    my @plan;
     if ($t and $t eq 'tests') {
-        plan( tests => shift @rest );
+        push @plan, tests => shift @rest;
         @_ = ($self, @rest);
     }
     elsif( $t and $t eq 'no_plan') {
-        carp "DEPRECATED. put a done_testing(); at the end of the script and remove 'no_plan'";
+        push @plan, tests => -1;
         @_ = ($self, @rest);
-        plan( "no_plan" );
+    };
+
+    if( @plan || $More ) {
+        Test::Contract::Build->contract_engine_init;
+        &plan( @plan ) ## no critic # bypass prototype
+            unless $More;
     };
 
     goto &Exporter::import; ## no critic

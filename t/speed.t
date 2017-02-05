@@ -21,7 +21,7 @@ if ($engine eq 'print') {
     $fname .= ".pm";
 
     require $fname;
-    $engine->import();
+    $engine->import( 'no_plan' );
 };
 
 for (1 .. $count) {

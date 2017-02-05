@@ -2,7 +2,7 @@ package Test::Simple;
 
 use strict;
 use warnings;
-our $VERSION = 0.04;
+our $VERSION = 0.0209;
 
 =head1 STOP!
 
@@ -13,11 +13,11 @@ without rewriting a lot of test scripts.
 =cut
 
 use Carp;
-use Test::Contract qw(no_init);
+use Test::More;
 
 # Just re-export everything
-our @ISA = qw(Test::Contract Exporter);
-our @EXPORT = @Test::Contract::EXPORT;
+our @ISA = qw(Test::More);
+our @EXPORT = @Test::More::EXPORT;
 
 END {
     if (Test::Builder->can("import")) {
