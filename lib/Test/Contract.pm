@@ -3,7 +3,7 @@ package Test::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0209;
+our $VERSION = 0.0210;
 
 =head1 NAME
 
@@ -281,14 +281,34 @@ See GETTERS in L<Test::Contract::Engine> for reference.
 
 =cut
 
-=head2 MANAGEMENT
+=head1 MANAGEMENT
 
 These functions are not exported and should be called as
 normal methods, i.e. Test::Contract->func( args );
 
+=head2 Test::Contract->new(%options)
+
+Returns a new L<Test::Contract::Engine> instance.
+This is just nere for convenience.
+
+=cut
+
+sub new {
+    my $class = shift; # unused
+    return Test::Contract::Engine->new(@_);
+};
+
 =head2 Test::Contract->engine();
 
 Returns current default contract engine.
+Engines are organised into a stack and the top of the stack is always returned.
+C<done_testing()> pops the stack.
+
+The contracts returned by new() are B<not> pushed onto the stack,
+unless C<start_testing> method is called for them explicitly.
+This is basically what contract { CODE; } does.
+
+Dies if nothing is on the stack right now.
 
 =cut
 

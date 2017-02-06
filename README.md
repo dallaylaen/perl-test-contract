@@ -1,16 +1,40 @@
 # NAME
 
-Test::Contract - a unified extensible testing and assertion tool
+Test::Contract - an object-oriented testing and assertion tool.
 
 # DESCRIPTION
 
-`Test::Contract` is a drop-in replacement for `Test::More`.
-It has some unique features, though:
+Test::Contract is similar to Test::More, however, it may be used in
+production code without turning the whole application into a test script.
 
-* can be used in production environment, without turning the whole application
-into a test script;
-* very easy to extend, and built with testability in mind;
-* much faster.
+# SYNOPSIS
+
+Say one needs to verify that user input or a plug-in module
+meet certain criteria:
+
+    use strict;
+    use warnings;
+
+    use Carp;
+    use Test::Contract ();
+
+    my $c = Test::Contract->new;
+    $c->like( $user_input, qr/.../, "Format as expected" );
+    $c->isa_ok( $some_object, "Some::Class" );
+    if ($c->get_passing) {
+        # so far, so good ....
+    } else {
+        carp "Contract failed: ".$c->get_tap;
+    };
+
+Or if a check is complex and cannot be broken down into Test::More-like
+primitives:
+
+    $c->refute( my_check( @args ), "Message" );
+
+Here `my_check` MUST return the reasons why `@args` do *not* pass the test,
+or return nothing.
+See also `Test::Contract::Build` module for extening available checks.
 
 # PHYLOSOPHY
 
@@ -29,41 +53,7 @@ Or quoting Leo Tolstoy,
 These *refute*s may be then applied as either assertions, or (unit) test
 building blocks.
 
-# SYNOPSIS
-
-`Test::Contract` may be used in place of Test::More, except for
-TODO: and SKIP: blocks (yet).
-
-    use Test::Contract;
-    use_ok qw(My::Module);
-
-    is (My::Module->answer, 42, "Life, universe, and everything");
-
-    done_testing;
-
-Also, `Test::Contract::Engine` may be used in production code to verify
-that user input or a plugin module meet certain criteria:
-
-    use Test::Contract::Engine;
-
-    my $c = Test::Contract::Engine->new;
-    $c->like( $user_input, qr/.../, "Format as expected" );
-    $c->isa_ok( $some_object, "Some::Class" );
-    if ($c->is_valid) {
-         # ....
-    };
-
-Or get the best of both worlds with a declarative interface!
-
-    use Test::Contract qw(no_init);
-
-    my $c = contract {
-        like   $user_input, qr/.../, "Format as expected";
-        isa_ok $some_object, "Some::Class";
-    };
-    if ($c->is_valid) {
-         # ....
-    };
+# EXTENDING THE CHECKS
 
 Writing your own tests is trivial. *All* you have to do is provide a subroutine
 that takes arguments and returns a true scalar if something went *not as
@@ -85,12 +75,17 @@ So this is a clumsy implementation of is()
 And of course you can test it with the powerful `contract { ... }->sign(...)`
 construct:
 
+    # This can be intermixed with Test::More/Test::Builder, provided
+    # Test::Contract is loaded *after* them.
+
+    use strict;
+    use warnings;
     use My::Test;
     use Test::Contract;
 
     my $c = contract {
-        my_is( 42, 42 );
-        my_is( 42, 137 );
+        my_is( 42, 42, "Life is life" );
+        my_is( 42, 137, "Life is fine (1/137 =~ fine structure constant)" );
     };
     $c->sign ( "10" ); # 2 tests, 1 pass, 1 fail
     note $c->get_tap;  # JFYI
