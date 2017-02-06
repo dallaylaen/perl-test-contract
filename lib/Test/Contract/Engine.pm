@@ -2,7 +2,7 @@ package Test::Contract::Engine;
 
 use strict;
 use warnings;
-our $VERSION = 0.0206;
+our $VERSION = 0.0207;
 
 =head1 NAME
 
@@ -92,28 +92,41 @@ sub contract (&;$) { ## no critic # need block function
 
 The generalized object-oriented interface for C<Test::Contract> goes below.
 
-=head2 new()
+=head2 new(%options)
 
-No options are currently being used. Just return an empty object.
-This MAY change in the future.
+Options may include:
+
+=over
+
+=item * indent
+
+=item * plan
+
+=back
+
+B<EXPERIMENTAL> These may change in the future.
 
 =cut
 
 sub new {
     my ($class, %opt) = @_;
 
-    my $new;
-    $new->{$_} = $opt{$_} for $class->_NEWOPTIONS;
-    $new->{indent} ||= 0;
-    $new->{plan}   ||= 0;
-    return bless $new, $class;
+    my $self;
+    $self->{$_} = $opt{$_} for $class->_NEWOPTIONS;
+    $self->{indent} ||= 0;
+
+    bless $self, $class;
+    $self->plan( $opt{plan} )
+        if $opt{plan};
+
+    return $self;
 };
 
 =head2 subcontract( %options )
 
 Create a fresh copy of current contract.
 
-Indent it by 1 unless $option{indent} given.
+Increase indent unless $option{indent} given.
 
 =cut
 
@@ -121,14 +134,23 @@ sub subcontract {
     my ($self, %opt) = @_;
 
     my $class = delete $opt{class} || ref $self;
+    my $name  = delete $opt{name}  || Carp::shortmess("Subcontract initiated");
+    $name =~ s/\n+$//;
 
     $opt{indent} = $self->get_indent + 1
         unless exists $opt{indent};
     exists $opt{$_} or $opt{$_} = $self->{$_}
         for $self->_NEWOPTIONS;
-    return $class->new( %opt );
+
+    my $child = $class->new( %opt );
+    $child->set_done_callback(sub {
+        $self->refute( !$child->get_passing && $child->get_tap, $name);
+    });
+
+    return $child;
 };
 
+# TODO this is so horribly broken. Use fields? Use Moose?..
 sub _NEWOPTIONS {
     return qw(indent);
 };
@@ -228,9 +250,8 @@ sub subtest {
     ref $code eq 'CODE'
         or croak ("subtest(): second argument must be CODE!");
 
-    my $subc = $self->subcontract;
+    my $subc = $self->subcontract( name => $name );
     &contract( $code, $subc );
-    $self->refute( $subc->get_error_count, $name);
 };
 
 =head2 done_testing
@@ -251,10 +272,9 @@ sub done_testing {
         )
     };
 
-    # engine cleanup MUST be called with true done flag.
     $self->{done}++;
-    Test::Contract::Build::contract_engine_cleanup();
     $self->on_done;
+    $self->_do_cleanup;
 
     return $self;
 };
@@ -344,14 +364,22 @@ sub sign {
     return shift;
 };
 
-sub DESTROY {
+sub _do_cleanup {
     my $self = shift;
-    foreach my $sub ( @{ $self->{on_done} || [] } ) {
+
+    foreach my $sub ( @{ delete $self->{on_done} || [] } ) {
         eval { $sub->($self); 1 } or do {
             carp "[$$]: on_done callback failed: $@";
         };
     };
+
     Test::Contract::Build::contract_engine_cleanup();
+        # TODO only if we're on the stack!
+};
+
+sub DESTROY {
+    my $self = shift;
+    $self->_do_cleanup;
 };
 
 =head1 GETTERS

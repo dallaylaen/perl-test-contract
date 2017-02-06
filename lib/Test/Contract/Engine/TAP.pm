@@ -2,7 +2,7 @@ package Test::Contract::Engine::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -100,14 +100,18 @@ sub get_tap {
     my $fails = $self->get_failed;
 
     foreach my $n (1 .. $self->get_count) {
-        my $f = $fails->{$n};
-        if (!$f) {
+        my $fail_pair = $fails->{$n};
+        if (!$fail_pair) {
             push @result, "ok $n";
             next;
         };
-        push @result
-            , "not ok $n - $f->[0]"
-            , $verb ? map { "# $_" } split "\n", $f->[1] : ();
+
+        push @result , "not ok $n"
+            .( $fail_pair->[0] ? " - $fail_pair->[0]" : '' );
+
+        if ($verb && !looks_like_number($fail_pair->[1])) {
+            push @result, map { "# $_" } split "\n", $fail_pair->[1];
+        };
     };
     push @result, $self->{bail_out}
         ? "Bail out! $self->{bail_out}"
