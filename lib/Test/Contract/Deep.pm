@@ -2,7 +2,7 @@ package Test::Contract::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ Test::Contract::Deep - is_deeply method for Test::Contract suite.
 
 =head1 DESCRIPTION
 
-Add C<is_deeply> method to L<Test::Contract> and L<Test::Contract::Engine>.
+Add C<is_deeply> method to L<Test::Contract> and L<Test::Contract>.
 
 =cut
 

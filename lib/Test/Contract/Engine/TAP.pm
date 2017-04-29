@@ -2,7 +2,7 @@ package Test::Contract::Engine::TAP;
 
 use strict;
 use warnings;
-our $VERSION = 0.0206;
+our $VERSION = 0.0207;
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ Test::Contract::Engine::TAP - Test Anything Protocol driver for Test::Contract
 This class provides compatibility with L<TAP::Harness> and C<prove>,
 allowing to use L<Test::Contract> as a L<Test::More> replacement.
 
-This class is a L<Test::Contract::Engine> descendant.
+This class is a L<Test::Contract> descendant.
 It is automatically instantiated by Test::Contract when you load it,
 so  that unit tests work.
 
@@ -22,7 +22,7 @@ so  that unit tests work.
 =cut
 
 use Carp;
-use parent qw(Test::Contract::Engine);
+use parent qw(Test::Contract);
 
 =head2 new( %options )
 

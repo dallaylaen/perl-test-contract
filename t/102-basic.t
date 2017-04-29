@@ -57,10 +57,10 @@ note contract {
 }->sign("10", "not_ok()")->get_tap;
 
 note contract {
-    isa_ok $_[0], "Test::Contract::Engine";
+    isa_ok $_[0], "Test::Contract";
     isa_ok $_[0], "Test::Contract::Engine::TAP";
-    isa_ok "Test::Contract::Engine::TAP", "Test::Contract::Engine";
-    isa_ok "Test::Contract::Engine", "Test::Contract::Engine::TAP";
+    isa_ok "Test::Contract::Engine::TAP", "Test::Contract";
+    isa_ok "Test::Contract", "Test::Contract::Engine::TAP";
     isa_ok "Test::Contract::Engine::TAP", "Test::Contract::Engine::TAP";
     isa_ok "No::Such::Package", "Test::Contract::Engine::TAP";
     isa_ok "Test::Contract::Engine::TAP", "No::Such::Package";
@@ -76,10 +76,10 @@ note contract {
 }->sign("10100", "can_ok()")->get_tap;
 
 note contract {
-    new_ok "Test::Contract::Engine";
-    new_ok "Test::Contract::Engine", [indent => 1];
-    new_ok "Test::Contract::Engine", [indent => 1], "Test::Contract::Engine::TAP";
-    new_ok "Test::Contract::Engine::TAP", [indent => 1], "Test::Contract::Engine";
+    new_ok "Test::Contract";
+    new_ok "Test::Contract", [indent => 1];
+    new_ok "Test::Contract", [indent => 1], "Test::Contract::Engine::TAP";
+    new_ok "Test::Contract::Engine::TAP", [indent => 1], "Test::Contract";
     new_ok "No::Such::Package";
     new_ok $_[0], [indent => 1];
     new_ok undef;

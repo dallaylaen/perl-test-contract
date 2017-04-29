@@ -14,12 +14,12 @@ is to_scalar(-42.137), -42.137, "to_scalar number";
 is to_scalar("foo bar"), '"foo bar"', "to_scalar string";
 is to_scalar("\t\0\n\"\\"), '"\\t\\0\\n\\"\\\\"', "to_scalar escape";
 
-like to_scalar( Test::Contract::Engine->new )
-    , "Test::Contract::Engine\\{.*\\}"
+like to_scalar( Test::Contract->new )
+    , "Test::Contract\\{.*\\}"
     , "to_scalar blessed";
 
-like to_scalar( Test::Contract::Engine->new, 0 )
-    , "Test::Contract::Engine/[a-f0-9]+"
+like to_scalar( Test::Contract->new, 0 )
+    , "Test::Contract/[a-f0-9]+"
     , "to_scalar blessed shallow";
 
 is to_scalar( [] ), "[]", "to_scalar empty array";

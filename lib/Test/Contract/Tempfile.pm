@@ -2,7 +2,7 @@ package Test::Contract::Tempfile;
 
 use strict;
 use warnings;
-our $VERSION = 0.0206;
+our $VERSION = 0.0207;
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ sub new {
     my ($class, %opt) = @_;
 
     $opt{contract} ||= contract_engine
-        or croak "$class->new: contract option is required and must be a Test::Contract::Engine";
+        or croak "$class->new: contract option is required and must be a Test::Contract";
 
     my $self = bless { contract => $opt{contract} }, $class;
 

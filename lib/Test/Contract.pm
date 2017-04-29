@@ -1,22 +1,22 @@
-package Test::Contract::Engine;
+package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0207;
+our $VERSION = 0.0208;
 
 =head1 NAME
 
-Test::Contract::Engine - apply a series of tests/assertions within an application/module
+Test::Contract - apply a series of tests/assertions within an application/module
 
 =head1 SYNOPSIS
 
     package My::Module;
-    use Test::Contract::Engine;
+    use Test::Contract;
 
     sub my_method {
         my $user_data = shift;
 
-        my $contract = Test::Contract::Engine->new;
+        my $contract = Test::Contract->new;
         $contract->is( $user_data->answer, 42, "Life and everything" );
         $contract->done_testing;
         if ($contract->get_passing) {
@@ -64,7 +64,7 @@ These two are equivalent:
 
 And
 
-    use Test::Contract::Engine;
+    use Test::Contract;
 
     my $contract = contract {
         my $c = shift;

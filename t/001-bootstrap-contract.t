@@ -26,7 +26,7 @@ sub strip;
 # my_is(42, 43, "is fails");
 
 require Test::Contract::Engine::TAP;
-my_is !!Test::Contract::Engine->can("new"), 1, "Test::Contract::Engine present";
+my_is !!Test::Contract->can("new"), 1, "Test::Contract present";
 
 # Abbreviate capture
 sub capture {
@@ -83,12 +83,12 @@ my_is( $output, "## note{}\n# diag[]\n", "note/diag work");
 
 print "# Testing contract...\n";
 
-Test::Contract::Engine->import("contract");
+Test::Contract->import("contract");
 sub contract (&;$); ## no critic # this dies if we change proto
 
 $c = contract {
 };
-my_is ref $c, "Test::Contract::Engine", "contract yields T::R::Contract";
+my_is ref $c, "Test::Contract", "contract yields T::R::Contract";
 my_is $c->get_count, 0, "Nothing done";
 my_is $c->get_error_count, 0, "No errors";
 my_is !$c->get_passing, "", "valid = true";
@@ -98,7 +98,7 @@ $c = contract {
     $_[0]->refute(0, "pass");
     $_[0]->refute(1, "fail");
 };
-my_is ref $c, "Test::Contract::Engine", "(2) contract yields T::R::Contract";
+my_is ref $c, "Test::Contract", "(2) contract yields T::R::Contract";
 my_is $c->get_count, 2, "count = 2";
 my_is $c->get_error_count, 1, "error = 1";
 my_is !$c->get_passing, 1, "valid = false";
@@ -134,7 +134,7 @@ if (!$pid) {
     Test::Contract::Unit->import( "no_plan" );
     is (42, 43, "fail");
     like (42, qr/\d+/, "pass");
-    new_ok( "Test::Contract::Engine" ); # ok, too
+    new_ok( "Test::Contract" ); # ok, too
     done_testing();
     exit;
     # END CHILD

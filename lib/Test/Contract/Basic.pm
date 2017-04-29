@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0204;
+our $VERSION = 0.0205;
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ Test::Contract::Basic - a set of most common tests for Test::Contract suite
 
 B<DO NOT USE THIS MODULE DIRECTLY>.
 Instead, load L<Test::Contract> for functional interface,
-or L<Test::Contract::Engine> for object-oriented one.
+or L<Test::Contract> for object-oriented one.
 Both would preload this module.
 
 This module contains most common test conditions similar to those in
@@ -23,7 +23,7 @@ Please refer here for an up-to-date reference.
 
 All functions are prototyped to be used without parentheses and
 exported by default.
-In addition, a C<Test::Contract::Engine-E<gt>function_name> method with
+In addition, a C<Test::Contract-E<gt>function_name> method with
 the same signature is generated for each of them (see L<Test::Contract::Build>).
 
 =cut

@@ -2,7 +2,7 @@ package Test::Contract::Engine::More;
 
 use strict;
 use warnings;
-our $VERSION = 0.0208;
+our $VERSION = 0.0209;
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ This module allows Test::Contract tests to play nice with Test::More and friends
 use Carp;
 use Test::Builder;
 
-use parent qw(Test::Contract::Engine);
+use parent qw(Test::Contract);
 
 sub _NEWOPTIONS { return __PACKAGE__->SUPER::_NEWOPTIONS, qw(test_builder) };
 
@@ -38,7 +38,7 @@ sub new {
 
 =head2 refute( $condition, $message )
 
-See L<Test::Contract::Engine>. This is L<Test::Builder>-based implementation.
+See L<Test::Contract>. This is L<Test::Builder>-based implementation.
 
 =cut
 

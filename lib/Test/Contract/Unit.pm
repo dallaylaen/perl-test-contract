@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0211;
+our $VERSION = 0.0212;
 
 =head1 NAME
 
@@ -37,8 +37,8 @@ However, it can also work inside an application:
 
 Or using the OO interface, if you prefer:
 
-    use Test::Contract::Engine;
-    my $contract = Test::Contract::Engine->new;
+    use Test::Contract;
+    my $contract = Test::Contract->new;
     $contract->like( $something, $something_else );
     $contract->done_testing; # this may be omitted
     if (!$contract->get_passing) {
@@ -74,7 +74,7 @@ package, with C<args> positional parameters and an optional human-readable
 message. (Think "ok 1", "ok 1 'test passed'").
 
 It will also create a corresponding is_everything method in
-L<Test::Contract::Engine> package so that OO interface described above
+L<Test::Contract> package so that OO interface described above
 is always on par with functional one.
 This is the main reason to need a builder at all.
 Suggestions how to reduce it even more are welcome.
@@ -92,7 +92,7 @@ use Carp;
 
 use Test::Contract::Build;
 use Test::Contract::Basic;
-use Test::Contract::Engine qw(contract);
+use Test::Contract qw(contract);
 use Test::Contract::Deep;
 
 use parent qw(Exporter);
@@ -277,7 +277,7 @@ foreach (@wrapper) {
 
 Run an enclosed set of tests, recording the results for future analysis.
 Returns a contract object.
-See GETTERS in L<Test::Contract::Engine> for reference.
+See GETTERS in L<Test::Contract> for reference.
 
 =cut
 
@@ -288,14 +288,14 @@ normal methods, i.e. Test::Contract->func( args );
 
 =head2 Test::Contract->new(%options)
 
-Returns a new L<Test::Contract::Engine> instance.
+Returns a new L<Test::Contract> instance.
 This is just nere for convenience.
 
 =cut
 
 sub new {
     my $class = shift; # unused
-    return Test::Contract::Engine->new(@_);
+    return Test::Contract->new(@_);
 };
 
 =head2 Test::Contract->engine();

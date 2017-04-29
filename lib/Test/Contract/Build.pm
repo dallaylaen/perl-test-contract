@@ -2,7 +2,7 @@ package Test::Contract::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -21,9 +21,9 @@ and a brief description of the problem on failure
 (e.g. C<"$got != $expected">);
 
 =item * build an exportable wrapper around it that would talk to
-the most up-to-date L<Test::Contract::Engine> instance;
+the most up-to-date L<Test::Contract> instance;
 
-=item * add a method with the same name to L<Test::Contract::Engine>
+=item * add a method with the same name to L<Test::Contract>
 so that object-oriented and functional interfaces
 are as close to each other as possible.
 
@@ -69,7 +69,7 @@ our @EXPORT_OK = qw(contract_engine_push contract_engine_cleanup);
 
 =head2 build_refute name => CODE, %options
 
-Create a function in calling package and a method in L<Test::Contract::Engine>.
+Create a function in calling package and a method in L<Test::Contract>.
 As a side effect, Test::Contract's internals are added to the caller's
 C<@CARP_NOT> array so that carp/croak points to actual outside usage.
 
@@ -97,7 +97,7 @@ my $trash_can = __PACKAGE__."::generated::For::Cover::To::See";
 sub build_refute(@) { ## no critic # Moose-like DSL for the win!
     my ($name, $cond, %opt) = @_;
 
-    my $class = "Test::Contract::Engine";
+    my $class = "Test::Contract";
 
     if (my $backend = ( $class->can($name) ? $class : $Backend{$name} ) ) {
         croak "build_refute(): '$name' already registered by $backend";
@@ -170,7 +170,7 @@ Make C<$contract> the default engine until it's detroyed, or done_testing is
 called. This is useful for stuff like subtests.
 As the name suggests, may be called multiple times, creating a stack.
 
-C<$contract> must be a L<Test::Contract::Engine> descendant.
+C<$contract> must be a L<Test::Contract> descendant.
 
 If C<$contract> goes out of scope, it is automatically removed from the stack.
 (See C<weaken> in L<Scalar::Util>).
@@ -184,8 +184,8 @@ Not exported by default.
 
 sub contract_engine_push {
     my $eng = shift;
-    blessed $eng and $eng->isa( "Test::Contract::Engine" )
-        or croak( "contract_engine_push(): won't load anything but Test::Contract::Engine" );
+    blessed $eng and $eng->isa( "Test::Contract" )
+        or croak( "contract_engine_push(): won't load anything but Test::Contract" );
     push @stack, $eng;
     weaken $stack[-1];
     return scalar @stack;
