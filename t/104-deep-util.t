@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Test::Contract::Unit q(no_plan);
 
-use Test::Contract::Deep;
+use Test::Contract::Basic::Deep;
 
-*to_scalar = \&Test::Contract::Deep::to_scalar;
+*to_scalar = \&Test::Contract::Basic::Deep::to_scalar;
 note "TESTING to_scalar()";
 
 is to_scalar(undef), "(undef)", "to_scalar undef";
@@ -29,7 +29,7 @@ is to_scalar( [foo => 42] ), "[\"foo\", 42]", "array with scalars";
 is to_scalar( {foo => 42} ), "{\"foo\":42}", "hash with scalars";
 
 note "TESTING deep_diff() negative";
-*deep_diff = \&Test::Contract::Deep::deep_diff;
+*deep_diff = \&Test::Contract::Basic::Deep::deep_diff;
 
 is deep_diff( undef, undef), '', "deep_diff undef";
 is deep_diff( 42, 42 ), '', "deep_diff equal";

@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0213;
+our $VERSION = 0.0214;
 
 =head1 NAME
 
@@ -93,7 +93,7 @@ use Carp;
 use Test::Contract::Engine::Build;
 use Test::Contract::Basic;
 use Test::Contract qw(contract);
-use Test::Contract::Deep;
+use Test::Contract::Basic::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing note diag bail_out subtest contract_is);

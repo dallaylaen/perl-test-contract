@@ -1,4 +1,4 @@
-package Test::Contract::Deep;
+package Test::Contract::Basic::Deep;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ our $VERSION = 0.0206;
 
 =head1 NAME
 
-Test::Contract::Deep - is_deeply method for Test::Contract suite.
+Test::Contract::Basic::Deep - is_deeply method for Test::Contract suite.
 
 =head1 DESCRIPTION
 

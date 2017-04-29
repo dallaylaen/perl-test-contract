@@ -3,7 +3,7 @@
 use strict;
 use warnings FATAL => qw(recursion);
 use Test::Contract::Unit q(no_plan);
-use Test::Contract::Deep qw(deep_diff);
+use Test::Contract::Basic::Deep qw(deep_diff);
 
 my $leaf1 = [];
 my $leaf2 = [];
