@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0212;
+our $VERSION = 0.0213;
 
 =head1 NAME
 
@@ -56,7 +56,7 @@ conditions and optimizes itself out if needed. That's not done yet.
 Extending the test suite goes as follows:
 
     package My::Package;
-    use Test::Contract::Build;
+    use Test::Contract::Engine::Build;
     use parent qw(Exporter);
 
     build_refute is_everything => sub {
@@ -78,7 +78,7 @@ L<Test::Contract> package so that OO interface described above
 is always on par with functional one.
 This is the main reason to need a builder at all.
 Suggestions how to reduce it even more are welcome.
-See L<Test::Contract::Build>.
+See L<Test::Contract::Engine::Build>.
 
 =head1 EXPORT
 
@@ -90,7 +90,7 @@ All functions in this module are exported by default.
 
 use Carp;
 
-use Test::Contract::Build;
+use Test::Contract::Engine::Build;
 use Test::Contract::Basic;
 use Test::Contract qw(contract);
 use Test::Contract::Deep;
@@ -125,7 +125,7 @@ sub import {
     };
 
     if( @plan || $More ) {
-        Test::Contract::Build->contract_engine_init;
+        Test::Contract::Engine::Build->contract_engine_init;
         &plan( @plan ) ## no critic # bypass prototype
             unless $More;
     };

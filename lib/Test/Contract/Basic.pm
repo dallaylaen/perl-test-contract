@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -24,13 +24,13 @@ Please refer here for an up-to-date reference.
 All functions are prototyped to be used without parentheses and
 exported by default.
 In addition, a C<Test::Contract-E<gt>function_name> method with
-the same signature is generated for each of them (see L<Test::Contract::Build>).
+the same signature is generated for each of them (see L<Test::Contract::Engine::Build>).
 
 =cut
 
 use Carp;
 use parent qw(Exporter);
-use Test::Contract::Build;
+use Test::Contract::Engine::Build;
 our @EXPORT;
 
 =head2 is $got, $expected, "explanation"

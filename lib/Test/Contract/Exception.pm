@@ -2,7 +2,7 @@ package Test::Contract::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ use Carp;
 use parent qw(Exporter);
 our @EXPORT = qw(dies lives_ok);
 
-use Test::Contract::Build qw(build_refute contract_engine);
+use Test::Contract::Engine::Build qw(build_refute contract_engine);
 
 =head2 dies { CODE; } qr/.../, "name";
 

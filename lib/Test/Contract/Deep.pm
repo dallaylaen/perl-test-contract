@@ -2,7 +2,7 @@ package Test::Contract::Deep;
 
 use strict;
 use warnings;
-our $VERSION = 0.0205;
+our $VERSION = 0.0206;
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ Add C<is_deeply> method to L<Test::Contract> and L<Test::Contract>.
 use Scalar::Util qw(refaddr);
 use parent qw(Exporter);
 
-use Test::Contract::Build;
+use Test::Contract::Engine::Build;
 
 our @EXPORT_OK = qw(deep_diff);
 

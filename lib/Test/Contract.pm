@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0208;
+our $VERSION = 0.0209;
 
 =head1 NAME
 
@@ -30,10 +30,10 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 use Exporter qw(import);
 
-use Test::Contract::Build qw(to_scalar);
+use Test::Contract::Engine::Build qw(to_scalar);
 
 our @EXPORT_OK = qw(contract);
-our @CARP_NOT = qw(Test::Contract::Build Test::Contract);
+our @CARP_NOT = qw(Test::Contract::Engine::Build Test::Contract);
 # preload most basic tests
 require Test::Contract::Basic;
 
@@ -205,7 +205,7 @@ sub start_testing {
     my $self = shift;
 
     $self->{count} and croak "start_testing() called after tests";
-    Test::Contract::Build::contract_engine_push( $self );
+    Test::Contract::Engine::Build::contract_engine_push( $self );
 
     return $self;
 };
@@ -360,7 +360,7 @@ B<EXPERIMENTAL> Name and meaning MAY change in the future.
 =cut
 
 sub sign {
-    Test::Contract::Build::contract_engine()->contract_is( @_ );
+    Test::Contract::Engine::Build::contract_engine()->contract_is( @_ );
     return shift;
 };
 
@@ -373,7 +373,7 @@ sub _do_cleanup {
         };
     };
 
-    Test::Contract::Build::contract_engine_cleanup();
+    Test::Contract::Engine::Build::contract_engine_cleanup();
         # TODO only if we're on the stack!
 };
 

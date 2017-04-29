@@ -1,12 +1,12 @@
-package Test::Contract::Build;
+package Test::Contract::Engine::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0206;
+our $VERSION = 0.0207;
 
 =head1 NAME
 
-Test::Contract::Build - tool for extending Test::Contract suite
+Test::Contract::Engine::Build - tool for extending Test::Contract suite
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Hence this module.
 Extending the test suite goes as follows:
 
     package My::Package;
-    use Test::Contract::Build;
+    use Test::Contract::Engine::Build;
     use parent qw(Exporter);
 
     build_refute is_everything => sub {

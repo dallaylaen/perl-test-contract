@@ -2,7 +2,7 @@ package Test::Contract::Tempfile;
 
 use strict;
 use warnings;
-our $VERSION = 0.0207;
+our $VERSION = 0.0208;
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 use File::Temp qw(tempfile tempdir);
 use parent qw(Exporter);
 
-use Test::Contract::Build;
+use Test::Contract::Engine::Build;
 
 our @EXPORT_OK = qw(mktemp);
 
