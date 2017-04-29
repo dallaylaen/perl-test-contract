@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0210;
+our $VERSION = 0.0211;
 
 =head1 NAME
 
@@ -30,7 +30,10 @@ modules, or checking that the code is error-free.
 
 A counterpart method exists for ALL Test::More standard checks.
 
-Also it is fairly simple to build custom conditions.
+Also it is fairly simple to build custom conditions - see
+BUILDING NEW ASSERTIONS below.
+
+See also L<Test::Contract::Unit> for a prototyped Test::More counterpart.
 
 =cut
 
@@ -657,6 +660,36 @@ sub _log {
     $mess =~ s#\n+$##s;
     push @{ $self->{log} }, $mess;
 };
+
+=head1 BUILDING NEW ASSERTIONS
+
+To create a new assertion, a function MUST be provided that returns
+an error message if something is wrong with its arguments,
+or any I<false> value otherwise.
+
+For instance,
+
+    package My::Package;
+    use Test::Contract::Engine::Build;
+    use parent qw(Exporter);
+
+    build_refute is_everything => sub {
+        return if $_[0] == 42;
+        return "$_[0] is not answer to life, universe, abd everything";
+    }, export => 1, args => 1;
+
+    1;
+
+This call will create a prototyped function is_everything(...) in the calling
+package, with C<args> positional parameters and an optional human-readable
+message. (Think "ok 1", "ok 1 'test passed'").
+
+It will also create a corresponding is_everything method in
+L<Test::Contract> package so that OO interface described above
+is always on par with functional one.
+This is the main reason to need a builder at all.
+Suggestions how to reduce it even more are welcome.
+See L<Test::Contract::Engine::Build> for more information.
 
 =head1 AUTHOR
 
