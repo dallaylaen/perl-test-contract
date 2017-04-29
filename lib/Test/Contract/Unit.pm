@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0215;
+our $VERSION = 0.0216;
 
 =head1 NAME
 
@@ -76,21 +76,19 @@ our $Fake; # See fake_lib/Test/More.pm
 sub import {
     my ($self, $t, @rest) = @_;
 
-    my @plan;
+    my $plan;
     if ($t and $t eq 'tests') {
-        push @plan, tests => shift @rest;
-        @_ = ($self, @rest);
+        $plan = shift @rest;
+        @_    = ($self, @rest);
     }
     elsif( $t and $t eq 'no_plan') {
-        push @plan, tests => -1;
-        @_ = ($self, @rest);
+        $plan = -1;
+        @_    = ($self, @rest);
     };
 
-    if( @plan || $More ) {
-        Test::Contract::Engine::Build->contract_engine_init;
-        &plan( @plan ) ## no critic # bypass prototype
-            unless $More;
-    };
+    Test::Contract::Engine::Build->contract_engine_init;
+    plan( tests => $plan )
+        if $plan;
 
     goto &Exporter::import; ## no critic
 };
