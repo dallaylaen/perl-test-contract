@@ -2,7 +2,7 @@ package Test::Contract::Engine::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.0207;
+our $VERSION = 0.0208;
 
 =head1 NAME
 
@@ -160,7 +160,7 @@ Returns current default engine, dies if none right now.
 my @stack;
 
 sub contract_engine() { ## no critic
-    @stack or croak [caller]->[3]."(): Not currently testing anything";
+    @stack or croak "FATAL: Test::Contract: Not currently testing anything";
     return $stack[-1];
 };
 
@@ -262,10 +262,10 @@ with Test::More.
 =cut
 
 my $main_engine;
-my $main_pid;
+my $main_pid = 0;
 
 sub contract_engine_init {
-    return if $main_engine;
+    return if $main_engine and $main_pid == $$;
 
     if (Test::Builder->can("ok")) {
         require Test::Contract::Engine::More;
