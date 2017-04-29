@@ -3,11 +3,11 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0214;
+our $VERSION = 0.0215;
 
 =head1 NAME
 
-Test::Contract::Unit - a lightweight unit-testing and assertion tool.
+Test::Contract::Unit - Object-oriented testing and assertion tool
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ The following is a prove-compatible test script. (See L<Test::More>).
 
     use strict;
     use warnings;
-    use Test::Contract;
+    use Test::Contract::Unit;
 
     use_ok( "My::Module" );
 
@@ -23,9 +23,11 @@ The following is a prove-compatible test script. (See L<Test::More>).
 
     done_testing; # required
 
-However, it can also work inside an application:
+However, it can also work inside an application (this is also how subtest are
+implemented):
 
     use Test::Contract qw(contract);
+    use Test::Contract::Unit;
 
     my $contract = contract {
         is ($user_input->{foo}, $bar, "Input as expected" );
@@ -35,50 +37,10 @@ However, it can also work inside an application:
         ...
     };
 
-Or using the OO interface, if you prefer:
+See L<Test::Contract> for more information about the OO interface.
 
-    use Test::Contract;
-    my $contract = Test::Contract->new;
-    $contract->like( $something, $something_else );
-    $contract->done_testing; # this may be omitted
-    if (!$contract->get_passing) {
-        ...
-    };
-
-There's also the central point of this module - the inverted assertion:
-
-    $contract->refute ( $what_exactly_went_wrong, $human_explanation);
-    # silent if arg1 is false, complains otherwise
-
-In theory, there should also be an assertion wrapper that dies on failed
-conditions and optimizes itself out if needed. That's not done yet.
-
-Extending the test suite goes as follows:
-
-    package My::Package;
-    use Test::Contract::Engine::Build;
-    use parent qw(Exporter);
-
-    build_refute is_everything => sub {
-        return if $_[0] == 42;
-        return "$_[0] is not answer to life, universe, abd everything";
-    }, export => 1, args => 1;
-
-    1;
-
-The function provided to builder must return a false value if everything is ok,
-or some details (but generally any true value) if not.
-
-This call will create a prototyped function is_everything(...) in the calling
-package, with C<args> positional parameters and an optional human-readable
-message. (Think "ok 1", "ok 1 'test passed'").
-
-It will also create a corresponding is_everything method in
-L<Test::Contract> package so that OO interface described above
-is always on par with functional one.
-This is the main reason to need a builder at all.
-Suggestions how to reduce it even more are welcome.
-See L<Test::Contract::Engine::Build>.
+See L<Test::Contract::Engine::Build> for information about
+building new assertions and/or custom test modules.
 
 =head1 EXPORT
 
@@ -399,7 +361,6 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 =cut
 
-1; # End of Test::Contract
+1; # End of Test::Contract::Unit
