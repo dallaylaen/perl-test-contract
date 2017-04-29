@@ -3,8 +3,8 @@
 use strict;
 use warnings FATAL => qw(all);
 
-# This is a Test::Contract bootstrap script.
-# We don't have Test::Contract yet to prove that Test::Contract works.
+# This is a Test::Contract::Unit bootstrap script.
+# We don't have Test::Contract::Unit yet to prove that Test::Contract::Unit works.
 # So we bootstrap it in several stages.
 # First, we postulate a naive my_is( $got, $expected, $comment ) function
 #     that just works due to its simplicity.
@@ -117,7 +117,7 @@ my_is (!!$fail->{2}, "", "nested pass 2");
 my_is (!!$fail->{3}, 1, "nested fail 3");
 my_is (!!$fail->{4}, 1, "nested fail 4");
 
-print "# Now some fork to check the whole Test::Contract magic is there\n";
+print "# Now some fork to check the whole Test::Contract::Unit magic is there\n";
 
 my ($pipe_r, $pipe_w);
 pipe ($pipe_r, $pipe_w)
@@ -130,8 +130,8 @@ if (!$pid) {
     # CHILD
     open STDOUT, ">&", $pipe_w;
     close $pipe_r;
-    require Test::Contract;
-    Test::Contract->import( "no_plan" );
+    require Test::Contract::Unit;
+    Test::Contract::Unit->import( "no_plan" );
     is (42, 43, "fail");
     like (42, qr/\d+/, "pass");
     new_ok( "Test::Contract::Engine" ); # ok, too
@@ -157,7 +157,7 @@ waitpid( -1, 0 );
 my_is $?>>8, 1, "returned 1 for 1 failed test";
 
 print "# Done testing...\n";
-print "# If passed, at least Test::Contract, contract{}, and \$contract->sign\n";
+print "# If passed, at least Test::Contract::Unit, contract{}, and \$contract->sign\n";
 print "#     can be used without much risk\n";
 
 sub strip {

@@ -2,12 +2,12 @@ package Test::Simple;
 
 use strict;
 use warnings;
-our $VERSION = 0.0209;
+our $VERSION = 0.0210;
 
 =head1 STOP!
 
 This is a fake Test::More.
-It is only here to test how Test::Contract behaves in place of Test::More
+It is only here to test how Test::Contract::Unit behaves in place of Test::More
 without rewriting a lot of test scripts.
 
 =cut

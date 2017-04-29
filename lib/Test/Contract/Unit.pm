@@ -1,13 +1,13 @@
-package Test::Contract;
+package Test::Contract::Unit;
 
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0210;
+our $VERSION = 0.0211;
 
 =head1 NAME
 
-Test::Contract - a lightweight unit-testing and assertion tool.
+Test::Contract::Unit - a lightweight unit-testing and assertion tool.
 
 =head1 SYNOPSIS
 

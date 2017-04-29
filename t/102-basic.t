@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract q(no_plan);
+use Test::Contract::Unit q(no_plan);
 
 note contract {
     is 42, 42;
@@ -70,8 +70,8 @@ note contract {
 note contract {
     can_ok $_[0], "can_ok";
     can_ok $_[0], "frobnicate";
-    can_ok "Test::Contract", "import", "can_ok";
-    can_ok "Test::Contract", "unknown_subroutine";
+    can_ok "Test::Contract::Unit", "import", "can_ok";
+    can_ok "Test::Contract::Unit", "unknown_subroutine";
     can_ok "No::Exist", "can", "isa", "import";
 }->sign("10100", "can_ok()")->get_tap;
 
@@ -86,7 +86,7 @@ note contract {
 }->sign("1101010", "new_ok()")->get_tap;
 
 note contract {
-    require_ok "Test::Contract";
+    require_ok "Test::Contract::Unit";
     require_ok "No::Such::Package::_______::000";
 }->sign("10", "require_ok")->get_tap;
 
