@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0216;
+our $VERSION = 0.0217;
 
 =head1 NAME
 
@@ -72,7 +72,6 @@ if ($More) {
     @EXPORT = qw(contract contract_is not_ok);
 };
 
-our $Fake; # See fake_lib/Test/More.pm
 sub import {
     my ($self, $t, @rest) = @_;
 
