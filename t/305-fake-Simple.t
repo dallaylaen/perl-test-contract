@@ -3,19 +3,14 @@
 use strict;
 use warnings;
 
-my $bin;
-BEGIN {
-    $bin = __FILE__;
-    $bin =~ s#/*[^/]+$##;
-    $bin ||= '.';
-    unshift @INC, "$bin/../fake_lib", "$bin/../lib";
-};
+use Test::Contract::Unit::Fake qw(more);
 
 use Test::Simple;
+
 die "FATAL: real Test::More loaded"
     if Test::Builder->can("ok");
 
 ok 1;
 
-done_testing();
+done_testing;
 

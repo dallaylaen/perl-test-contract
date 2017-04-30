@@ -10,23 +10,23 @@ use File::Basename qw(basename dirname);
 
 # Always use latest & greatest lib, if available
 use lib dirname(__FILE__)."/../lib";
-use Test::Contract;
+use Test::Contract::Unit;
 use Test::Contract::Engine::TAP;
 use Test::Contract::Engine::TAP::Reader;
 
 my $all = Test::Contract::Engine::TAP->new->start_testing;
 
 # make Getopt work with Perl-ish notation
-@ARGV = map { /(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
+@ARGV = map { /^(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
 
 my @inc;
-my @fake;
+my $fake;
 my @preload;
 GetOptions (
     "I=s" => \@inc,
     "help" => \&usage,
     "preload=s" => \@preload,
-    "faketest" => sub { @fake = ( dirname(__FILE__)."/../fake_lib"); },
+    "faketest" => \$fake,
 ) or die "Bad options. See $0 --help";
 
 sub usage {
@@ -43,8 +43,13 @@ HELP
     exit 0;
 };
 
+if ($fake) {
+    require Test::Contract::Unit::Fake;
+    Test::Contract::Unit::Fake->fake_test_more;
+};
+
 my @plopt;
-push @plopt, map { "-I$_" } @fake, @inc;
+push @plopt, map { "-I$_" } @inc;
 @preload = split /,/,join ",", @preload;
 
 my @files;
@@ -55,7 +60,7 @@ find( sub {
 @files = sort @files;
 
 if (@preload) {
-    unshift @INC, @fake, @inc;
+    unshift @INC, @inc;
 
     package main;
 
