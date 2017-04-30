@@ -2,7 +2,7 @@ package Test::Contract::Tempfile;
 
 use strict;
 use warnings;
-our $VERSION = 0.0208;
+our $VERSION = 0.03;
 
 =head1 NAME
 

@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0212;
+our $VERSION = 0.03;
 
 =head1 NAME
 

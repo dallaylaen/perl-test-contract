@@ -1,5 +1,14 @@
 Revision history for Test-Contract
 
+0.03    Sun Apr 30 2017
+        - Rename Test::Refute => Test::Contract, make OO variant the default
+        - API Add Test::Contract::Unit for unit testing
+        - BIN rework refute.pl greatly
+        - API BREAK Handle exceptions inside contract{}, fail if died
+        - TST Add first example
+        - MOD Add Test::More compatibility layer
+        - MOD Add Tempfile module
+
 0.02    Thu Jan 05 2017
         The module can test itself without external help.
         The module can take over all conditions in Test::More (-TODO & SKIP)
