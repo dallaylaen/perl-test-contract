@@ -43,14 +43,16 @@ HELP
     exit 0;
 };
 
-if ($fake) {
-    require Test::Contract::Unit::Fake;
-    Test::Contract::Unit::Fake->fake_test_more;
-};
-
 my @plopt;
 push @plopt, map { "-I$_" } @inc;
 @preload = split /,/,join ",", @preload;
+
+if ($fake) {
+    warn "Fake Test::More in action\n";
+    push @plopt,
+         '-I'.dirname(__FILE__)."/../lib",
+         '-MTest::Contract::Unit::Fake=more';
+};
 
 my @files;
 find( sub {
@@ -61,6 +63,11 @@ find( sub {
 
 if (@preload) {
     unshift @INC, @inc;
+
+    if ($fake) {
+        require Test::Contract::Unit::Fake;
+        Test::Contract::Unit::Fake->fake_test_more;
+    };
 
     package main;
 
