@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0211;
+our $VERSION = 0.0212;
 
 =head1 NAME
 
@@ -63,18 +63,7 @@ Said contract object is passed to CODE reference as first argument,
 so that one can run assertions is production code without polluting
 the global namespace.
 
-These two are equivalent:
-
-    use Test::Contract;
-
-    my $contract = contract {
-        is $foo, $baf, "foobar";
-    };
-    if ($contract->get_passing) {
-        ...
-    };
-
-And
+CODE is eval'ed, causing contract to fail if there was an exception.
 
     use Test::Contract;
 
@@ -94,7 +83,8 @@ sub contract (&;$) { ## no critic # need block function
     $engine ||= __PACKAGE__->new;
     $engine->start_testing;
 
-    $code->($engine);
+    eval { $code->($engine); 1; }
+        or $engine->ok (0, "exception: $@");
     $engine->done_testing
         unless $engine->get_done;
     return $engine;
