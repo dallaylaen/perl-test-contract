@@ -10,11 +10,10 @@ use File::Basename qw(basename dirname);
 
 # Always use latest & greatest lib, if available
 use lib dirname(__FILE__)."/../lib";
-use Test::Contract::Unit;
 use Test::Contract::Engine::TAP;
 use Test::Contract::Engine::TAP::Reader;
 
-my $all = Test::Contract::Engine::TAP->new->start_testing;
+my $all = Test::Contract::Engine::TAP->new;
 
 # make Getopt work with Perl-ish notation
 @ARGV = map { /^(-[IMm])(.*)/ ? ($1, $2) : $_ } @ARGV;
@@ -54,6 +53,8 @@ if ($fake) {
          '-MTest::Contract::Unit::Fake=more';
 };
 
+usage() unless @ARGV;
+
 my @files;
 find( sub {
     -f $_ and /\.t$/ and push @files, $File::Find::name;
@@ -84,7 +85,8 @@ foreach my $f (@files) {
     my $tap = get_reader( $f );
     # TODO parallel??
     $tap->finish;
-    not_ok !$tap->get_passing && $tap, $f;
+    # Sic! Here get_passing is the condition, and $tap itself is details
+    $all->refute( !$tap->get_passing && $tap, $f );
 };
 
 my $failed = $all->get_failed;
