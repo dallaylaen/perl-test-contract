@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.03;
+our $VERSION = 0.0301;
 
 =head1 NAME
 
@@ -244,18 +244,6 @@ See GETTERS in L<Test::Contract> for reference.
 
 These functions are not exported and should be called as
 normal methods, i.e. Test::Contract->func( args );
-
-=head2 Test::Contract->new(%options)
-
-Returns a new L<Test::Contract> instance.
-This is just nere for convenience.
-
-=cut
-
-sub new {
-    my $class = shift; # unused
-    return Test::Contract->new(@_);
-};
 
 =head2 Test::Contract->engine();
 
