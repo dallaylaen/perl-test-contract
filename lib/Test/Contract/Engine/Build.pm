@@ -2,7 +2,7 @@ package Test::Contract::Engine::Build;
 
 use strict;
 use warnings;
-our $VERSION = 0.03;
+our $VERSION = 0.0301;
 
 =head1 NAME
 
@@ -48,12 +48,32 @@ Extending the test suite goes as follows:
 
     1;
 
-The function provided to builder must return a false value if everything is ok,
+This can be later used either inside production code to check a condition:
+
+    use Test::Contract;
+    use My::Package;
+    my $c = contract {
+        is_everything( $foo );
+        $_[0]->is_everything( $bar ); # ditto
+    };
+    # ... check $c validity
+
+or in a test script:
+
+    use Test::More;
+    use My::Package;
+    is_everything $foo, "Check for answer";
+    done_testing;
+
+The function provided to builder MUST return a false value if everything is ok,
 or some details (but generally any true value) if not.
 
 This call will create a prototyped function is_everything(...) in the calling
 package, with C<args> positional parameters and an optional human-readable
-message. (Think "ok 1", "ok 1 'test passed'").
+message. (Think C<ok 1>, C<ok 1 'test passed'>).
+
+Such function will perform the check under both Test::Contract and
+L<Test::More>.
 
 =head1 FUNCTIONS
 
@@ -72,6 +92,9 @@ our @EXPORT_OK = qw(contract_engine_push contract_engine_cleanup);
 Create a function in calling package and a method in L<Test::Contract>.
 As a side effect, Test::Contract's internals are added to the caller's
 C<@CARP_NOT> array so that carp/croak points to actual outside usage.
+
+B<NOTE> One needs to use Exporter explicitly if either C<export>
+or C<export_ok> option is in use. This MAY change in the future.
 
 Options may include:
 
@@ -153,14 +176,27 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
 
 =head2 contract_engine
 
-Returns current default engine, dies if none right now.
+Returns the L<Test::Contract> instance performing tests at the moment.
+
+If there's none, an exception is thrown. As an exception,
+if Test::Builder is detected an engine will be created on the fly.
 
 =cut
 
 my @stack;
 
 sub contract_engine() { ## no critic
-    @stack or croak "FATAL: Test::Contract: Not currently testing anything";
+    if (!@stack) {
+        if ( Test::Builder->can("new") and Test::Builder->can("ok")) {
+            eval {
+                require Test::Contract::Engine::More;
+                push @stack, Test::Contract::Engine::More->new;
+                1;
+            } and return $stack[-1];
+            carp "Failed to load Test::Builder-compatible backend: $@";
+        };
+        croak "FATAL: Test::Contract: Not currently testing anything";
+    };
     return $stack[-1];
 };
 
@@ -253,11 +289,11 @@ sub to_scalar {
 
 =head2 contract_engine_init
 
-Start default testing engine if run from within a test script.
-The engine will be created just once and put on top of the stack.
+If Test::Contract engine stack is empty, create an engine assuming we're
+in a test script. A L<Test::More> compatibility layer will be loaded
+if needed.
 
-This should be called from custom modules to be able to interact
-with Test::More.
+B<NOTE> Dangerous. This function, although safe, is mostly for internal usage.
 
 =cut
 
