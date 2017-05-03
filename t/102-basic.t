@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use Test::Contract::Unit q(no_plan);
 
-note contract {
+my $c;
+
+$c = contract {
     is 42, 42;
     is 42, 137;
     is undef, '';
@@ -17,9 +19,11 @@ note contract {
     my @x = 1..5;
     my @y = 11..15;
     is @x, @y, "scalar context";
-}->sign("1000110001", "is()")->get_tap;
+};
+is $c->get_sign, "t1000110001d", "is()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     isnt 42, 137;
     isnt 42, 42;
     isnt undef, undef;
@@ -27,36 +31,46 @@ note contract {
     isnt 42, undef;
     isnt '', undef;
     isnt undef, '';
-}->sign("1001111", "isnt()")->get_tap;
+};
+is $c->get_sign, "t1001111d", "isnt()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     like "foo", qr/oo*/;
     like "foo", "oo*";
     like "foo", qr/bar/;
     like "foo", "f.*o";
     like undef, qr/.*/;
-}->sign("10010", "like()")->get_tap;
+};
+is $c->get_sign, "t10010d", "like()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     unlike "foo", qr/bar/;
     unlike "foo", qr/foo/;
     unlike "foo", "oo*";
     unlike "foo", "f.*o";
     unlike undef, qr/.*/;
-}->sign("10100", "unlike()")->get_tap;
+};
+is $c->get_sign, "t10100d", "unlike()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     ok ok 1;
     ok ok 0;
     ok undef;
-}->sign("11000", "ok()")->get_tap;
+};
+is $c->get_sign, "t11000d", "ok()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     not_ok 0;
     not_ok { foo => 42 };
-}->sign("10", "not_ok()")->get_tap;
+};
+is $c->get_sign, "t10d", "not_ok()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     isa_ok $_[0], "Test::Contract";
     isa_ok $_[0], "Test::Contract::Engine::TAP";
     isa_ok "Test::Contract::Engine::TAP", "Test::Contract";
@@ -65,17 +79,21 @@ note contract {
     isa_ok "No::Such::Package", "Test::Contract::Engine::TAP";
     isa_ok "Test::Contract::Engine::TAP", "No::Such::Package";
     isa_ok "No::Such::Package", "No::Such::Package";
-}->sign("10101000", "isa_ok()")->get_tap;
+};
+is $c->get_sign, "t10101000d", "isa_ok()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     can_ok $_[0], "can_ok";
     can_ok $_[0], "frobnicate";
     can_ok "Test::Contract::Unit", "import", "can_ok";
     can_ok "Test::Contract::Unit", "unknown_subroutine";
     can_ok "No::Exist", "can", "isa", "import";
-}->sign("10100", "can_ok()")->get_tap;
+};
+is $c->get_sign, "t10100d", "can_ok()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     new_ok "Test::Contract";
     new_ok "Test::Contract", [indent => 1];
     new_ok "Test::Contract", [indent => 1], "Test::Contract::Engine::TAP";
@@ -83,11 +101,15 @@ note contract {
     new_ok "No::Such::Package";
     new_ok $_[0], [indent => 1];
     new_ok undef;
-}->sign("1101010", "new_ok()")->get_tap;
+};
+is $c->get_sign, "t1101010d", "new_ok()";
+note $c->get_tap;
 
-note contract {
+$c = contract {
     require_ok "Test::Contract::Unit";
     require_ok "No::Such::Package::_______::000";
-}->sign("10", "require_ok")->get_tap;
+};
+is $c->get_sign, "t10d", "require_ok()";
+note $c->get_tap;
 
 done_testing;

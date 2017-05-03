@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.03;
+our $VERSION = 0.0301;
 
 =head1 NAME
 
@@ -357,11 +357,12 @@ Usage is like this:
 
 Returns self so that other methods MAY be chained.
 
-B<EXPERIMENTAL> Name and meaning MAY change in the future.
+B<DEPRECATED> Use contract_is or get_sign+like instead.
 
 =cut
 
 sub sign {
+    carp "DEPRECATED: contract->sign. Use contract_is or get_sign+like instead.";
     Test::Contract::Engine::Build::contract_engine()->contract_is( @_ );
     return shift;
 };
@@ -483,6 +484,29 @@ sub get_tap {
     return join "\n",
         (map { "$dent$_" } grep { !/^#{$verbose}/ } @{ $self->{log} })
         , '';
+};
+
+=head2 get_sign
+
+Returns a string representing the contract fullfillment so far.
+
+Current format is "t[01]*d?", where t is just there to avoid accidental
+numeric comparison, string of 01's represents individual tests, and 'd'
+appears if no more tests may be performed (i.e. done_testing called).
+
+B<EXPERIMENTAL>. The format MAY change in the future.
+
+=cut
+
+sub get_sign {
+    my $self = shift;
+    my @out = ("t");
+
+    my $not_ok = $self->get_failed;
+    push @out, map { $not_ok->{$_} ? 0 : 1 } 1..$self->get_count;
+
+    push @out, 'd' if $self->get_done;
+    return join '', @out;
 };
 
 =head2 get_indent

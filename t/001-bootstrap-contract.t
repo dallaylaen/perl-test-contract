@@ -106,16 +106,13 @@ my_is $c->get_tap(0), "ok 1 - pass\nnot ok 2 - fail\n1..2\n"
     , "output as expected in get_tap";
 
 $c = contract {
-    contract {
-        $_[0]->ok(1, "pass");
-        $_[0]->ok(0, "fail");
-    }->sign(1)->sign(10)->sign("01")->sign(101);
+    $_[0]->ok(1, "pass");
+    $_[0]->ok(0, "fail");
 };
 my $fail = $c->get_failed;
-my_is (!!$fail->{1}, 1, "nested fail 1");
-my_is (!!$fail->{2}, "", "nested pass 2");
-my_is (!!$fail->{3}, 1, "nested fail 3");
-my_is (!!$fail->{4}, 1, "nested fail 4");
+my_is (!!$fail->{1}, "", "contract pass 1");
+my_is (!!$fail->{2}, 1,  "contract fail 2");
+my_is ($c->get_sign, "t10d", "contract signature as expected");
 
 print "# Now some fork to check the whole Test::Contract::Unit magic is there\n";
 
@@ -157,8 +154,8 @@ waitpid( -1, 0 );
 my_is $?>>8, 1, "returned 1 for 1 failed test";
 
 print "# Done testing...\n";
-print "# If passed, at least Test::Contract::Unit, contract{}, and \$contract->sign\n";
-print "#     can be used without much risk\n";
+print "# If passed, at least Test::Contract::Unit, contract{...},\n";
+print "#     and \$contract->get_sign can be used without much risk\n";
 
 sub strip {
     my $x = shift || '';

@@ -21,7 +21,7 @@ close( $write )
     or die "$!";
 
 $tap->finish;
-$tap->sign(10);
+is $tap->get_sign, "t10d", "signature as expected";
 
 note $tap->get_tap;
 
