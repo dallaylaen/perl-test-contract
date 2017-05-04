@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0303;
+our $VERSION = 0.0304;
 
 =head1 NAME
 
@@ -84,7 +84,7 @@ sub contract (&;$) { ## no critic # need block function
     $engine->start_testing;
 
     eval { $code->($engine); 1; }
-        or $engine->ok (0, "exception: $@");
+        or $engine->refute ("contract{}: unhandled exception: $@");
     $engine->done_testing
         unless $engine->get_done;
     return $engine;
