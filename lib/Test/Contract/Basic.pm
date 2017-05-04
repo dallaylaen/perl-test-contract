@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0302;
+our $VERSION = 0.0303;
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ build_refute use_ok => sub {
     my $caller = caller(1);
     eval "package $caller; use $mod \@arg; 1" and return ''; ## no critic
     return "Failed to use $mod: ".($@ || "(unknown error)");
-}, no_pop => 1, export => 1;
+}, list => 1, export => 1;
 
 build_refute require_ok => sub {
     my ($mod, @arg) = @_;
@@ -188,7 +188,7 @@ build_refute can_ok => sub {
 
     my @missing = grep { !$class->can($_) } @_;
     return @missing && (to_scalar($class, 0)." has no methods ".join ", ", @missing);
-}, no_pop => 1, export => 1;
+}, list => 1, export => 1;
 
 =head2 isa_ok
 
@@ -198,6 +198,11 @@ build_refute isa_ok => \&_isa_ok, args => 2, export => 1;
 
 build_refute new_ok => sub {
     my ($class, $args, $target) = @_;
+
+    croak ("new_ok(): at least one argument must be present")
+        unless defined $class;
+    croak ("new_ok(): too many arguments")
+        if @_ > 3;
 
     $args   ||= [];
     $class  = ref $class || $class;
@@ -209,7 +214,7 @@ build_refute new_ok => sub {
         unless $class->can( "new" );
 
     return _isa_ok( $class->new( @$args ), $target );
-}, no_pop => 1, export => 1;
+}, list => 1, export => 1;
 
 sub _isa_ok {
     my ($obj, $class) = @_;

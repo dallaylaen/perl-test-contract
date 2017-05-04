@@ -2,7 +2,7 @@ package Test::Contract::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.03;
+our $VERSION = 0.0301;
 
 =head1 NAME
 
@@ -41,8 +41,7 @@ All functions below are exported by default.
 =cut
 
 use Carp;
-use parent qw(Exporter);
-our @EXPORT = qw(dies lives_ok);
+use Exporter qw(import);
 
 use Test::Contract::Engine::Build qw(build_refute contract_engine);
 
@@ -55,10 +54,10 @@ Check that code dies, and exception matches the regex specified.
 build_refute dies => sub {
     my ($code, $expr) = @_;
 
-    $expr =~ qr/$expr/
-        unless ref $expr eq 'Regexp';
     croak "dies: 1st argument must be a function or code block"
         unless ref $code eq 'CODE';
+    $expr =~ qr/$expr/
+        unless ref $expr eq 'Regexp';
 
     eval { $code->() };
     return 0 if $@ =~ $expr;
@@ -67,11 +66,7 @@ build_refute dies => sub {
         unless $@;
 
     return "Got: $@\nExpected: $expr\n ";
-}, args => 2, no_create => 1;
-
-sub dies (&@) { ## no critic # need block function
-    contract_engine->dies(@_);
-};
+}, block => 1, args => 1, export => 1;
 
 =head2 lives_ok { CODE; } "name";
 
@@ -87,10 +82,6 @@ build_refute lives_ok => sub {
 
     eval { $code->(); 1 } and return 0;
     return "Code dies unexpectedly: ".($@ || "(unknown error)");
-}, args => 1, no_create => 1;
-
-sub lives_ok (&@) { ## no critic # need block function
-    contract_engine->lives_ok(@_);
-};
+}, block => 1, args => 0, export => 1;
 
 1;

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
+use Test::Contract::Unit;
 use Test::Contract::Exception;
 
 my $out;
