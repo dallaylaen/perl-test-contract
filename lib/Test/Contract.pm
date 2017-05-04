@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0304;
+our $VERSION = 0.0305;
 
 =head1 NAME
 
@@ -576,6 +576,9 @@ sub on_done {
 
     my $comment = $self->{skip_all} ? (' # SKIP '.$self->{skip_all} ) : '';
     $self->_log( "1.." .$self->get_count . $comment );
+    $self->_log( sprintf "# Failed %d tests out of %d"
+        , $self->get_error_count, $self->get_count )
+            if $self->get_error_count;
 };
 
 =head2 bail_out( $reason )
