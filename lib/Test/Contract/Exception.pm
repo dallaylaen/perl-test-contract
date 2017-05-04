@@ -2,7 +2,7 @@ package Test::Contract::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.0301;
+our $VERSION = 0.0302;
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ See L<Test::Contract> for the general rules regarding tests, contracts, etc.
         My::Module->safe;
     }, "the code doesn't die";
 
-    dies {
+    dies_like {
         My::Module->unsafe;
     }, qr(My::Module), "the code dies as expected";
 
@@ -45,13 +45,13 @@ use Exporter qw(import);
 
 use Test::Contract::Engine::Build qw(build_refute contract_engine);
 
-=head2 dies { CODE; } qr/.../, "name";
+=head2 dies_like { CODE; } qr/.../, "name";
 
 Check that code dies, and exception matches the regex specified.
 
 =cut
 
-build_refute dies => sub {
+build_refute dies_like => sub {
     my ($code, $expr) = @_;
 
     croak "dies: 1st argument must be a function or code block"
@@ -59,11 +59,9 @@ build_refute dies => sub {
     $expr =~ qr/$expr/
         unless ref $expr eq 'Regexp';
 
-    eval { $code->() };
+    eval { $code->(); 1 }
+        and return "Code block lives unexpectedly";
     return 0 if $@ =~ $expr;
-
-    return "Code block lives"
-        unless $@;
 
     return "Got: $@\nExpected: $expr\n ";
 }, block => 1, args => 1, export => 1;

@@ -16,7 +16,7 @@ my $c = contract {
 is $c->get_sign, "t101000d";
 note $c->get_tap;
 
-dies {
+dies_like {
     cmp_ok 1, "<<", 2;
 } qr/cmp_ok.*Comparison.*<</;
 

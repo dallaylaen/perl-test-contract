@@ -7,14 +7,14 @@ use Test::Contract::Exception;
 
 my $out;
 $out = contract {
-    dies {
+    dies_like {
         die "foo";
     } "foo", "Dies ok";
 }->get_tap(0);
 is $out, "ok 1 - Dies ok\n1..1\n", "ok scenario";
 
 $out = contract {
-    dies {
+    dies_like {
         die "foo";
     } "bar", "Dies ok";
 }->get_tap(0);
