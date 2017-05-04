@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.03;
+our $VERSION = 0.0302;
 
 =head1 NAME
 
@@ -10,21 +10,30 @@ Test::Contract::Basic - a set of most common tests for Test::Contract suite
 
 =head1 DESCRIPTION
 
-B<DO NOT USE THIS MODULE DIRECTLY>.
-Instead, load L<Test::Contract> for functional interface,
-or L<Test::Contract> for object-oriented one.
-Both would preload this module.
-
 This module contains most common test conditions similar to those in
-L<Test::More>, like C<is $got, $expected;> or C<like $got, qr/.../>.
-Please refer here for an up-to-date reference.
+L<Test::More>, like C<is $got, $expected;> or C<like $got, qr/.../;>.
+
+Using L<Test::Contract::Unit> would imply being inside a unit test script,
+whereas this module would just export some testing functions.
 
 =head1 FUNCTIONS
 
-All functions are prototyped to be used without parentheses and
-exported by default.
+All functions below are prototyped to be used without parentheses and
+exported by default. Scalar context is imposed onto arguments, so
+
+    is @foo, @bar;
+
+would actually compare arrays by length.
+
+If a C<contract { ... }> is in action, the results of each assertion
+will be recorded there. See L<Test::Contract> for more.
+If L<Test::Contract::Unit>/L<Test::More> is in action,
+a unit testing script is assumed.
+If neither is true, an exception is thrown.
+
 In addition, a C<Test::Contract-E<gt>function_name> method with
-the same signature is generated for each of them (see L<Test::Contract::Engine::Build>).
+the same signature is generated for each of them
+(see L<Test::Contract::Engine::Build>).
 
 =cut
 
@@ -218,5 +227,47 @@ sub _isa_ok {
     };
     return '';
 };
+
+=head2 contract_is $contract, "signature", ["message"]
+
+Check that a contract has been executed to exactly the specified extent.
+
+Signature format is "[01]*d", where t is just there to avoid accidental
+numeric comparison, string of 01's represents individual tests, and 'd'
+appears if no more tests may be performed (i.e. done_testing called).
+
+B<EXPERIMENTAL>. The signature MAY change in the future.
+
+=cut
+
+build_refute contract_is => sub {
+    my ($c, $condition) = @_;
+
+    # the happy case first
+    my $not_ok = $c->get_failed;
+    my @out = map { $not_ok->{$_} ? 0 : 1 } 1..$c->get_count;
+    return ''
+        if $condition eq join "", @out;
+
+    # analyse what went wrong - it did if we're here
+    my @cond = split / *?/, $condition;
+    my @fail;
+    push @fail, "Contract signature: @out";
+    push @fail, "Expected:           @cond";
+    push @fail, sprintf "Tests executed: %d of %d", scalar @out, scalar @cond
+        if @out != @cond;
+    for (my $i = 0; $i<@out && $i<@cond; $i++) {
+        next if $out[$i] eq $cond[$i];
+        my $n = $i + 1;
+        push @fail, "Unexpected " .($not_ok->{$n} ? "not ok $n" : "ok $n");
+        if ($not_ok->{$n}) {
+            push @fail, map { "DIAG # $_" } split /\n+/, $not_ok->{$n}[1]
+        };
+    };
+
+    croak "Impossible: contract_is broken. File a bug in Test::Contract immediately!"
+        if !@fail;
+    return join "\n", @fail;
+}, args => 2, export => 1;
 
 1;

@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0302;
+our $VERSION = 0.0303;
 
 =head1 NAME
 
@@ -294,36 +294,6 @@ in the future.
 See also get_sign() below.
 
 =cut
-
-sub contract_is {
-    my ($self, $c, $condition, $name) = @_;
-
-    # the happy case first
-    my $not_ok = $c->get_failed;
-    my @out = map { $not_ok->{$_} ? 0 : 1 } 1..$c->get_count;
-    return $self->refute( '', $name )
-        if $condition eq join "", @out;
-
-    # analyse what went wrong - it did if we're here
-    my @cond = split / *?/, $condition;
-    my @fail;
-    push @fail, "Contract signature: @out";
-    push @fail, "Expected:           @cond";
-    push @fail, sprintf "Tests executed: %d of %d", scalar @out, scalar @cond
-        if @out != @cond;
-    for (my $i = 0; $i<@out && $i<@cond; $i++) {
-        next if $out[$i] eq $cond[$i];
-        my $n = $i + 1;
-        push @fail, "Unexpected " .($not_ok->{$n} ? "not ok $n" : "ok $n");
-        if ($not_ok->{$n}) {
-            push @fail, map { "DIAG # $_" } split /\n+/, $not_ok->{$n}[1]
-        };
-    };
-
-    croak "Impossible: contract_is broken. File a bug immediately!"
-        if !@fail;
-    return $self->refute( join "\n", @fail );
-};
 
 sub _do_cleanup {
     my $self = shift;
