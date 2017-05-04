@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0301;
+our $VERSION = 0.0302;
 
 =head1 NAME
 
@@ -291,7 +291,7 @@ denoted by the bit string.
 B<EXPERIMENTAL> The second argument's meaning MAY change or be extended
 in the future.
 
-See also sign() below.
+See also get_sign() below.
 
 =cut
 
@@ -320,51 +320,9 @@ sub contract_is {
         };
     };
 
-    croak "Impossible: contract_is/sign broken. File a bug immediately!"
+    croak "Impossible: contract_is broken. File a bug immediately!"
         if !@fail;
     return $self->refute( join "\n", @fail );
-};
-
-
-=head2 sign( expectation, comment)
-
-Check that the contract is fulfilled to exactly the given extent,
-AND record that test with the current GLOBAL contract engine
-(likely NOT the calling object itself).
-
-I<Somewhat twisted logic here...>
-
-Expectations are currently supported in the only format:
-a string of 0's and 1's.
-More formats MAY follow in the future.
-
-See contract_is() in L<Test::Contract::Basic>.
-
-Usage is like this:
-
-    use strict;
-    use warnings;
-    use Test::Contract;
-
-    # ...
-    contract {
-        ok 1;
-        ok 1;
-        ok 0;
-        ok 1;
-    }->sign( "1101" );
-    done_testing;
-
-Returns self so that other methods MAY be chained.
-
-B<DEPRECATED> Use contract_is or get_sign+like instead.
-
-=cut
-
-sub sign {
-    carp "DEPRECATED: contract->sign. Use contract_is or get_sign+like instead.";
-    Test::Contract::Engine::Build::contract_engine()->contract_is( @_ );
-    return shift;
 };
 
 sub _do_cleanup {
