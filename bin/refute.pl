@@ -23,10 +23,11 @@ my @inc;
 my @use;
 my $fake;
 my @preload;
+Getopt::Long::Configure("no_ignore_case");
 GetOptions (
     "I=s" => \@inc,
-    "M=s" => sub { push @use, $_[0] =~ /=/ ? $_[0] : "$_[0]=" },
-    "m=s" => \@use,
+    "M=s" => sub { push @use, "-M$_[1]" },
+    "m=s" => sub { push @use, "-m$_[1]" },
     "help" => \&usage,
     "preload=s" => \@preload,
     "faketest" => \$fake,
@@ -50,7 +51,7 @@ HELP
 
 my @plopt;
 push @plopt, map { "-I$_" } @inc;
-push @plopt, map { /=/ ? "-M$_" : "-m$_" } @use;
+push @plopt, @use;
 @preload = split /,/,join ",", @preload;
 
 if ($fake) {
@@ -68,7 +69,6 @@ find( sub {
 }, @ARGV);
 
 @files = sort @files;
-
 if (@preload) {
     unshift @INC, @inc;
 
@@ -77,15 +77,8 @@ if (@preload) {
         Test::Contract::Unit::Fake->fake_test_more;
     };
 
-    package main;
-
-    foreach ( @use ) {
-        my ($mod, $rawarg) = split /=/, $_, 2;
-        my $arg = defined $rawarg ? [split /,/, $rawarg ] : undef;
-        Test::Contract::bin::load_module($mod, $arg);
-    };
-    foreach ( @preload ) {
-        Test::Contract::bin::load_module($_);
+    foreach my $mod( @preload ) {
+        load_module("-m$mod");
     };
 };
 
@@ -126,13 +119,17 @@ sub get_reader {
                 $0 = $f;
                 @ARGV = ();
 
+                foreach my $mod ( @use ) {
+                    load_module($mod);
+                };
+
                 eval {
                     package main;
                     do $f;
                     die $@ if $@;
                     1;
                 } or do {
-                    not_ok $@ || $! || 1, "died";
+                    print "not ok 1 - died: $@\n1..1\n";
                     exit 1;
                 };
                 exit 0;
@@ -152,23 +149,32 @@ sub get_reader {
 };
 
 sub load_module {
-    my ($mod, $args) = @_;
-    $mod =~ /^(-?)([a-z]\w+(?:::\w+)*)$/
-        or croak "Bad module name: $mod";
-    (my $no, $mod) = ($1, $2);
+    my $spec = shift;
+    $spec =~ /^(-[Mm])(-?)([A-Za-z]\w+(?:::\w+)*)(?:=(.*))?$/
+        or croak "Bad module spec: $spec";
+    my ($import, $no, $mod, $rawarg) = ($1, $2, $3, $4);
+    $import = ($import eq "-M"); # to bool
+
+    croak "Impossible module spec: $spec"
+        if !$import and ($no or defined $rawarg);
+
+    warn "Loading $spec as '$import', '$no', '$mod', '".($rawarg||'')."'";
+
+    my $args = defined $rawarg ? [split /,/, $rawarg] : [];
+
     my $file = $mod;
     $file =~ s#::#/#g;
     $file .= ".pm";
-    eval { require $file; 1 } or croak $@;
+    eval { package main; require $file; 1 }
+        or croak "Failed to preload $mod: $@";
     if ($no) {
-        $args ||= [];
-        eval { $mod->unimport(@$args); 1; }
+        eval { package main; $mod->unimport(@$args); 1; }
             or croak "Failed to unload $mod: $@";
     }
-    elsif ($args) {
-        eval { $mod->import(@$args); 1; }
+    elsif ($import) {
+        eval { package main; $mod->import(@$args); 1; }
             or croak "Failed to preload $mod: $@";
     };
-    warn( ($no ? "Pre":"Un")."loaded $mod from $INC{$file}\n");
+    warn( ($no ? "Un":"Pre")."loaded $mod from $INC{$file}\n");
 };
 
