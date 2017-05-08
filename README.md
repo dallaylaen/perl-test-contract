@@ -9,6 +9,10 @@ Test::Contract is there to add series of
 into production code without turning the whole application
 into a test script.
 
+This may be useful, for instance, when loading a plugin, validating a
+complex piece of data, or checking that different implementations
+(PP vs XS and more) behave the same.
+
 Also it's fairly easy to extend it with new conditions that will
 play along nicely with both Test::More and Test::Contract.
 
@@ -48,11 +52,17 @@ in `Test::Contract`.
 
 The most basic check in `Test::Contract` is
 `$contract->refute( $what_went_unexpected, $why_we_care_about_it );`.
-This may be viewed as an *inverted* `ok` or `assert`.
+This may be viewed as an *inverted* `ok` or `assert`:
+
+    sub refute {
+        my ($condition, $message) = @_;
+        ok (!$condition, $message)
+            or diag $condition;
+    };
 
 It is assumed that a passing check is of no interest, while a failed one
 begs for details, and therefore a *false* value in the first argument
-means a passing test whereas a *true* one is considered to be
+means a pass test while a *true* one is considered to be
 also the explanation.
 
 Think of it as an expection in a program,
@@ -116,7 +126,7 @@ on specifically the tests with unexpected results:
 `Test::Contract::Unit` may be intermixed with regular `Test::More`, as long
 as it comes AFTER `Test::More`.
 
-# A LITTLE PHYLOSOPHY
+# A LITTLE PHILOSOPHY
 
 Using refutation instead of assertion is similar to the
 [falsifiability](https://en.wikipedia.org/wiki/Falsifiability)
