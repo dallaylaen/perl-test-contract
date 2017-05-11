@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0304;
+our $VERSION = 0.0305;
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ the same signature is generated for each of them
 =cut
 
 use Carp;
+use Scalar::Util qw(blessed looks_like_number);
 use parent qw(Exporter);
 use Test::Contract::Engine::Build;
 our @EXPORT = qw(diag note);
@@ -116,19 +117,29 @@ Fails if any argument is undefined.
 my %compare;
 $compare{$_} = eval "sub { return \$_[0] $_ \$_[1]; }" ## no critic
     for qw( < <= == != >= > lt le eq ne ge gt );
+my %numeric;
+$numeric{$_}++ for qw( < <= == != >= > );
 
 build_refute cmp_ok => sub {
     my ($x, $op, $y) = @_;
 
-    my @missing;
-    push @missing, 1 unless defined $x;
-    push @missing, 2 unless defined $y;
-    return "Argument(@missing) undefined"
-        if @missing;
-
     my $fun = $compare{$op};
     croak "cmp_ok(): Comparison '$op' not implemented"
         unless $fun;
+
+    my @missing;
+    if ($numeric{$op}) {
+        push @missing, '1 '.to_scalar($x).' is not numeric'
+            unless looks_like_number $x or blessed $x;
+        push @missing, '2 '.to_scalar($y).' is not numeric'
+            unless looks_like_number $y or blessed $y;
+    } else {
+        push @missing, '1 is undefined' unless defined $x;
+        push @missing, '2 is undefined' unless defined $y;
+    };
+
+    return "cmp_ok '$op': argument ". join ", ", @missing
+        if @missing;
 
     return '' if $fun->($x, $y);
     return "$x\nis not '$op'\n$y";
