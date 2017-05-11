@@ -2,7 +2,7 @@ package Test::Contract::Basic;
 
 use strict;
 use warnings;
-our $VERSION = 0.0303;
+our $VERSION = 0.0304;
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ the same signature is generated for each of them
 use Carp;
 use parent qw(Exporter);
 use Test::Contract::Engine::Build;
-our @EXPORT;
+our @EXPORT = qw(diag note);
 
 =head2 is $got, $expected, "explanation"
 
@@ -274,5 +274,23 @@ build_refute contract_is => sub {
         if !@fail;
     return join "\n", @fail;
 }, args => 2, export => 1;
+
+=head2 diag @msg
+
+Human-readable diagnostic message.
+
+=head2 note @msg
+
+Human-readable comment message.
+
+=cut
+
+sub diag (@) { ## no critic
+    contract_engine->diag(@_);
+};
+
+sub note (@) { ## no critic
+    contract_engine->note(@_);
+};
 
 1;

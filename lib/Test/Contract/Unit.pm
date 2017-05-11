@@ -3,7 +3,7 @@ package Test::Contract::Unit;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0302;
+our $VERSION = 0.0303;
 
 =head1 NAME
 
@@ -58,7 +58,7 @@ use Test::Contract qw(contract);
 use Test::Contract::Basic::Deep;
 
 use parent qw(Exporter);
-my @wrapper = qw(done_testing note diag bail_out subtest);
+my @wrapper = qw(done_testing bail_out subtest);
 my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
 our @EXPORT = (@own, @wrapper, @reexport, @Test::Contract::Basic::EXPORT);
