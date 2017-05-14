@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0306;
+our $VERSION = 0.0307;
 
 =head1 NAME
 
@@ -25,15 +25,42 @@ Test::Contract - Object-oriented testing and assertion tool
 Test::Contract can check sets of L<Test::More>-like conditions
 without turning the whole application into a giant test script.
 
-This may be useful when validating user input, loading plug-ins or external
-modules, or checking that the code is error-free.
+This may be useful when integrating with a piece of code you are
+I<not> in control of. Foir instance, loading a plugin, validating
+complex input, or making sure a replacement module (think XS vs PP)
+is actually a replacement.
 
 A counterpart method exists for ALL Test::More standard checks.
+In addition, some extra checks and prototyped syntactic sugar exist - see below.
 
-Also it is fairly simple to build custom conditions - see
+Also it is fairly easy to build custom conditions - see
 BUILDING NEW ASSERTIONS below.
 
-See also L<Test::Contract::Unit> for a prototyped Test::More counterpart.
+=head1 CONTENT OF THIS PACKAGE
+
+=over
+
+=item * L<Test::Contract> - a basic contract class for accumulating and querying
+check results.
+
+=item * L<Test::Contract::Basic> - a standard check library with prototyped
+L<Test::More> conterparts. C<use>ing it will make them all available.
+The checks would operate on the current contract (see C<contract { ... } below)
+or die if none present.
+
+=item * L<Test::Contract::Unit> - experimental Test::More counterpart.
+It is used to test this package itself.
+
+=item * L<Test::Contract::Engine::Build> - helper module for building
+more checks.
+
+=item * L<Test::Contract::Exception>, L<Test::Contract::Warn> - experimental
+C<warn>/C<die> interceptors.
+
+=item * L<Test::Contract::Tempfile> - experimental temporary resource
+management module.
+
+=back
 
 =cut
 
