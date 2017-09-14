@@ -2,7 +2,7 @@ package Test::Contract;
 
 use strict;
 use warnings;
-our $VERSION = 0.0307;
+our $VERSION = 0.0308;
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ check results.
 
 =item * L<Test::Contract::Basic> - a standard check library with prototyped
 L<Test::More> conterparts. C<use>ing it will make them all available.
-The checks would operate on the current contract (see C<contract { ... } below)
+The checks would operate on the current contract (see C<contract { ... }> below)
 or die if none present.
 
 =item * L<Test::Contract::Unit> - experimental Test::More counterpart.
