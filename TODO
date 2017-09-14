@@ -1,0 +1,15 @@
+SINCE   TARGET  DESCRIPTION
+-- up next --
+-- backlog --
+0.02    0.10    API todo {} block
+0.02    0.10    MOD Test::Number::Delta
+0.02    0.10    MOD Devel::Cover support
+0.03    0.20    API checkpoint_ok - abort testing unless passing at this point
+0.03    0.20    MOD is_number, is_integer, is_natural
+0.02    0.20    MOD Test::Deep
+0.03    0.20    API Rename getters (get_ok, etc)
+0.02    0.20    MOD Test::Differences (diff, LCS)
+-- think more --
+0.02    0.10    MOD temp resources
+0.01    0.10    API contract_fork (async?)
+0.01    0.10    MOD assert (merge with another?)
