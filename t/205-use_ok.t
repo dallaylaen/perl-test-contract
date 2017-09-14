@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Exception;
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Exception;
 
 my $c = contract {
     local $INC{"No/Such/Module.pm"} = 1;
@@ -11,7 +11,7 @@ my $c = contract {
     local *No::Such::Module::import = sub { die "deliberately" };
 
     lives_ok {
-        use_ok "Test::Contract::Unit";
+        use_ok "Assert::Refute::Unit";
     } "and live until the end";
     lives_ok {
         use_ok "No::Such::Module";

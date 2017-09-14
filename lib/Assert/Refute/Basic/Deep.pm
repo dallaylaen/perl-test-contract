@@ -1,4 +1,4 @@
-package Test::Contract::Basic::Deep;
+package Assert::Refute::Basic::Deep;
 
 use strict;
 use warnings;
@@ -6,18 +6,18 @@ our $VERSION = 0.03;
 
 =head1 NAME
 
-Test::Contract::Basic::Deep - is_deeply method for Test::Contract suite.
+Assert::Refute::Basic::Deep - is_deeply method for Assert::Refute suite.
 
 =head1 DESCRIPTION
 
-Add C<is_deeply> method to L<Test::Contract> and L<Test::Contract>.
+Add C<is_deeply> method to L<Assert::Refute> and L<Assert::Refute>.
 
 =cut
 
 use Scalar::Util qw(refaddr);
 use parent qw(Exporter);
 
-use Test::Contract::Engine::Build;
+use Assert::Refute::Engine::Build;
 
 our @EXPORT_OK = qw(deep_diff);
 

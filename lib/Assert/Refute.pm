@@ -1,4 +1,4 @@
-package Test::Contract;
+package Assert::Refute;
 
 use strict;
 use warnings;
@@ -6,14 +6,14 @@ our $VERSION = 0.0308;
 
 =head1 NAME
 
-Test::Contract - Object-oriented testing and assertion tool
+Assert::Refute - Object-oriented testing and assertion tool
 
 =head1 SYNOPSIS
 
     # Somewhere inside production codebase
-    use Test::Contract;
+    use Assert::Refute;
 
-    my $c = Test::Contract->new;
+    my $c = Assert::Refute->new;
     $c->is ($foo, $bar, "Foo equals bar");
     $c->like ($user_input, qr/F?o?r?m?a?t/, "Input format as expected");
     if ($c->get_passing) {
@@ -22,7 +22,7 @@ Test::Contract - Object-oriented testing and assertion tool
 
 =head1 DESCRIPTION
 
-Test::Contract can check sets of L<Test::More>-like conditions
+Assert::Refute can check sets of L<Test::More>-like conditions
 without turning the whole application into a giant test script.
 
 This may be useful when integrating with a piece of code you are
@@ -40,24 +40,24 @@ BUILDING NEW ASSERTIONS below.
 
 =over
 
-=item * L<Test::Contract> - a basic contract class for accumulating and querying
+=item * L<Assert::Refute> - a basic contract class for accumulating and querying
 check results.
 
-=item * L<Test::Contract::Basic> - a standard check library with prototyped
+=item * L<Assert::Refute::Basic> - a standard check library with prototyped
 L<Test::More> conterparts. C<use>ing it will make them all available.
 The checks would operate on the current contract (see C<contract { ... }> below)
 or die if none present.
 
-=item * L<Test::Contract::Unit> - experimental Test::More counterpart.
+=item * L<Assert::Refute::Unit> - experimental Test::More counterpart.
 It is used to test this package itself.
 
-=item * L<Test::Contract::Engine::Build> - helper module for building
+=item * L<Assert::Refute::Engine::Build> - helper module for building
 more checks.
 
-=item * L<Test::Contract::Exception>, L<Test::Contract::Warn> - experimental
+=item * L<Assert::Refute::Exception>, L<Assert::Refute::Warn> - experimental
 C<warn>/C<die> interceptors.
 
-=item * L<Test::Contract::Tempfile> - experimental temporary resource
+=item * L<Assert::Refute::Tempfile> - experimental temporary resource
 management module.
 
 =back
@@ -68,13 +68,13 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 use Exporter qw(import);
 
-use Test::Contract::Engine::Build qw(to_scalar);
+use Assert::Refute::Engine::Build qw(to_scalar);
 
 our @EXPORT_OK = qw(contract);
-our @CARP_NOT = qw(Test::Contract::Engine::Build Test::Contract::Unit);
+our @CARP_NOT = qw(Assert::Refute::Engine::Build Assert::Refute::Unit);
 # preload most basic tests
-require Test::Contract::Basic;
-require Test::Contract::Basic::Deep;
+require Assert::Refute::Basic;
+require Assert::Refute::Basic::Deep;
 
 =head1 OPTIONAL EXPORT
 
@@ -92,7 +92,7 @@ the global namespace.
 
 CODE is eval'ed, causing contract to fail if there was an exception.
 
-    use Test::Contract;
+    use Assert::Refute;
 
     my $contract = contract {
         my $c = shift;
@@ -120,7 +120,7 @@ sub contract (&;$) { ## no critic # need block function
 
 =head1 METHODS
 
-The generalized object-oriented interface for C<Test::Contract> goes below.
+The generalized object-oriented interface for C<Assert::Refute> goes below.
 
 =head2 new(%options)
 
@@ -235,7 +235,7 @@ sub start_testing {
     my $self = shift;
 
     $self->{count} and croak "start_testing() called after tests";
-    Test::Contract::Engine::Build::contract_engine_push( $self );
+    Assert::Refute::Engine::Build::contract_engine_push( $self );
 
     return $self;
 };
@@ -332,7 +332,7 @@ sub _do_cleanup {
         };
     };
 
-    Test::Contract::Engine::Build::contract_engine_cleanup();
+    Assert::Refute::Engine::Build::contract_engine_cleanup();
         # TODO only if we're on the stack!
 };
 
@@ -426,7 +426,7 @@ sub get_failed {
 
 Get contract evaluation result as a multiline scalar.
 
-May NOT be available in subclasses (dies in C<Test::Contract::Engine::TAP>).
+May NOT be available in subclasses (dies in C<Assert::Refute::Engine::TAP>).
 
 =cut
 
@@ -643,7 +643,7 @@ or any I<false> value otherwise.
 For instance,
 
     package My::Package;
-    use Test::Contract::Engine::Build;
+    use Assert::Refute::Engine::Build;
     use parent qw(Exporter);
 
     build_refute is_everything => sub {
@@ -658,11 +658,11 @@ package, with C<args> positional parameters and an optional human-readable
 message. (Think "ok 1", "ok 1 'test passed'").
 
 It will also create a corresponding is_everything method in
-L<Test::Contract> package so that OO interface described above
+L<Assert::Refute> package so that OO interface described above
 is always on par with functional one.
 This is the main reason to need a builder at all.
 Suggestions how to reduce it even more are welcome.
-See L<Test::Contract::Engine::Build> for more information.
+See L<Assert::Refute::Engine::Build> for more information.
 
 =head1 AUTHOR
 
@@ -673,14 +673,14 @@ Konstantin S. Uvarin, C<< <khedin at gmail.com> >>
 This is alpha software, lots of bugs guaranteed.
 
 Please report any bugs or feature requests to C<bug-test-refute at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Contract>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Assert-Refute>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Test::Contract
+    perldoc Assert::Refute
 
 You can also look for information at:
 
@@ -688,19 +688,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Contract>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Assert-Refute>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Test-Contract>
+L<http://annocpan.org/dist/Assert-Refute>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Test-Contract>
+L<http://cpanratings.perl.org/d/Assert-Refute>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Test-Contract/>
+L<http://search.cpan.org/dist/Assert-Refute/>
 
 =back
 
@@ -750,4 +750,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Test::Contract
+1; # End of Assert::Refute

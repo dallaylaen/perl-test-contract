@@ -1,4 +1,4 @@
-package Test::Contract::Exception;
+package Assert::Refute::Exception;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ our $VERSION = 0.0302;
 
 =head1 NAME
 
-Test::Contract::Exception - eval/die related plugin for Test::Contract
+Assert::Refute::Exception - eval/die related plugin for Assert::Refute
 
 =head1 DESCRIPTION
 
@@ -15,11 +15,11 @@ given code block.
 
 See also L<Test::Exception>. This one is MUCH simpler.
 
-See L<Test::Contract> for the general rules regarding tests, contracts, etc.
+See L<Assert::Refute> for the general rules regarding tests, contracts, etc.
 
 =head1 SYNOPSIS
 
-    use Test::Contract;
+    use Assert::Refute;
     use Test::Exception;
 
     use My::Module;
@@ -43,7 +43,7 @@ All functions below are exported by default.
 use Carp;
 use Exporter qw(import);
 
-use Test::Contract::Engine::Build qw(build_refute contract_engine);
+use Assert::Refute::Engine::Build qw(build_refute contract_engine);
 
 =head2 dies_like { CODE; } qr/.../, "name";
 

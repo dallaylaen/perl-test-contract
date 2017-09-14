@@ -2,5 +2,5 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit tests => 1;
+use Assert::Refute::Unit tests => 1;
 ok (1, "placeholder");

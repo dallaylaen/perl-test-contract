@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Contract::Unit::Fake qw(more);
+use Assert::Refute::Unit::Fake qw(more);
 
 use Test::Simple;
 

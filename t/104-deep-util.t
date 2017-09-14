@@ -2,11 +2,11 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
+use Assert::Refute::Unit q(no_plan);
 
-use Test::Contract::Basic::Deep;
+use Assert::Refute::Basic::Deep;
 
-*to_scalar = \&Test::Contract::Basic::Deep::to_scalar;
+*to_scalar = \&Assert::Refute::Basic::Deep::to_scalar;
 note "TESTING to_scalar()";
 
 is to_scalar(undef), "(undef)", "to_scalar undef";
@@ -14,12 +14,12 @@ is to_scalar(-42.137), -42.137, "to_scalar number";
 is to_scalar("foo bar"), '"foo bar"', "to_scalar string";
 is to_scalar("\t\0\n\"\\"), '"\\t\\0\\n\\"\\\\"', "to_scalar escape";
 
-like to_scalar( Test::Contract->new )
-    , "Test::Contract\\{.*\\}"
+like to_scalar( Assert::Refute->new )
+    , "Assert::Refute\\{.*\\}"
     , "to_scalar blessed";
 
-like to_scalar( Test::Contract->new, 0 )
-    , "Test::Contract/[a-f0-9]+"
+like to_scalar( Assert::Refute->new, 0 )
+    , "Assert::Refute/[a-f0-9]+"
     , "to_scalar blessed shallow";
 
 is to_scalar( [] ), "[]", "to_scalar empty array";
@@ -29,7 +29,7 @@ is to_scalar( [foo => 42] ), "[\"foo\", 42]", "array with scalars";
 is to_scalar( {foo => 42} ), "{\"foo\":42}", "hash with scalars";
 
 note "TESTING deep_diff() negative";
-*deep_diff = \&Test::Contract::Basic::Deep::deep_diff;
+*deep_diff = \&Assert::Refute::Basic::Deep::deep_diff;
 
 is deep_diff( undef, undef), '', "deep_diff undef";
 is deep_diff( 42, 42 ), '', "deep_diff equal";

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
+use Assert::Refute::Unit q(no_plan);
 
 my $c;
 
@@ -71,13 +71,13 @@ is $c->get_sign, "t10d", "not_ok()";
 note $c->get_tap;
 
 $c = contract {
-    isa_ok $_[0], "Test::Contract";
-    isa_ok $_[0], "Test::Contract::Engine::TAP";
-    isa_ok "Test::Contract::Engine::TAP", "Test::Contract";
-    isa_ok "Test::Contract", "Test::Contract::Engine::TAP";
-    isa_ok "Test::Contract::Engine::TAP", "Test::Contract::Engine::TAP";
-    isa_ok "No::Such::Package", "Test::Contract::Engine::TAP";
-    isa_ok "Test::Contract::Engine::TAP", "No::Such::Package";
+    isa_ok $_[0], "Assert::Refute";
+    isa_ok $_[0], "Assert::Refute::Engine::TAP";
+    isa_ok "Assert::Refute::Engine::TAP", "Assert::Refute";
+    isa_ok "Assert::Refute", "Assert::Refute::Engine::TAP";
+    isa_ok "Assert::Refute::Engine::TAP", "Assert::Refute::Engine::TAP";
+    isa_ok "No::Such::Package", "Assert::Refute::Engine::TAP";
+    isa_ok "Assert::Refute::Engine::TAP", "No::Such::Package";
     isa_ok "No::Such::Package", "No::Such::Package";
 };
 is $c->get_sign, "t10101000d", "isa_ok()";
@@ -86,18 +86,18 @@ note $c->get_tap;
 $c = contract {
     can_ok $_[0], "can_ok";
     can_ok $_[0], "frobnicate";
-    can_ok "Test::Contract::Unit", "import", "can_ok";
-    can_ok "Test::Contract::Unit", "unknown_subroutine";
+    can_ok "Assert::Refute::Unit", "import", "can_ok";
+    can_ok "Assert::Refute::Unit", "unknown_subroutine";
     can_ok "No::Exist", "can", "isa", "import";
 };
 is $c->get_sign, "t10100d", "can_ok()";
 note $c->get_tap;
 
 $c = contract {
-    new_ok "Test::Contract";
-    new_ok "Test::Contract", [indent => 1];
-    new_ok "Test::Contract", [indent => 1], "Test::Contract::Engine::TAP";
-    new_ok "Test::Contract::Engine::TAP", [indent => 1], "Test::Contract";
+    new_ok "Assert::Refute";
+    new_ok "Assert::Refute", [indent => 1];
+    new_ok "Assert::Refute", [indent => 1], "Assert::Refute::Engine::TAP";
+    new_ok "Assert::Refute::Engine::TAP", [indent => 1], "Assert::Refute";
     new_ok "No::Such::Package";
     new_ok $_[0], [indent => 1];
     new_ok undef;
@@ -106,7 +106,7 @@ is $c->get_sign, "t1101010d", "new_ok()";
 note $c->get_tap;
 
 $c = contract {
-    require_ok "Test::Contract::Unit";
+    require_ok "Assert::Refute::Unit";
     require_ok "No::Such::Package::_______::000";
 };
 is $c->get_sign, "t10d", "require_ok()";

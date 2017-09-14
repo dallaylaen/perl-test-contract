@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# A brief example showing Test::Contract usage.
+# A brief example showing Assert::Refute usage.
 # An unforeknown module is being tested for having a new() method
 # returning an instance of itself.
 
@@ -10,7 +10,7 @@ use File::Basename;
 
 # Always latest and greatest libs
 use lib dirname(__FILE__)."/../lib";
-use Test::Contract;
+use Assert::Refute;
 
 my $mod = shift;
 if (!$mod) {
@@ -23,7 +23,7 @@ if ($mod !~ /^[a-z]\w*(?:::\w+)*$/i) {
 };
 
 # Start a contract
-my $c = Test::Contract->new;
+my $c = Assert::Refute->new;
 
 # Check conditions
 $c->require_ok($mod)

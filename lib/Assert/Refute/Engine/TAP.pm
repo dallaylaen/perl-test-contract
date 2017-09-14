@@ -1,4 +1,4 @@
-package Test::Contract::Engine::TAP;
+package Assert::Refute::Engine::TAP;
 
 use strict;
 use warnings;
@@ -6,15 +6,15 @@ our $VERSION = 0.03;
 
 =head1 NAME
 
-Test::Contract::Engine::TAP - Test Anything Protocol driver for Test::Contract
+Assert::Refute::Engine::TAP - Test Anything Protocol driver for Assert::Refute
 
 =head1 DESCRIPTION
 
 This class provides compatibility with L<TAP::Harness> and C<prove>,
-allowing to use L<Test::Contract> as a L<Test::More> replacement.
+allowing to use L<Assert::Refute> as a L<Test::More> replacement.
 
-This class is a L<Test::Contract> descendant.
-It is automatically instantiated by Test::Contract when you load it,
+This class is a L<Assert::Refute> descendant.
+It is automatically instantiated by Assert::Refute when you load it,
 so  that unit tests work.
 
 =head1 METHODS
@@ -22,7 +22,7 @@ so  that unit tests work.
 =cut
 
 use Carp;
-use parent qw(Test::Contract);
+use parent qw(Assert::Refute);
 
 =head2 new( %options )
 

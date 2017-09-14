@@ -2,8 +2,8 @@
 
 use strict;
 use warnings FATAL => qw(recursion);
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Basic::Deep qw(deep_diff);
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Basic::Deep qw(deep_diff);
 
 my $leaf1 = [];
 my $leaf2 = [];

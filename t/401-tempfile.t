@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Tempfile qw(mktemp);
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Tempfile qw(mktemp);
 
 my $where = $ENV{TEMP} || $ENV{TMP} || '/tmp';
 my $tpl = "$where/test-contract-XXXXXXXXX";

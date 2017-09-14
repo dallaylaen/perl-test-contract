@@ -1,4 +1,4 @@
-package Test::Contract::Engine::More;
+package Assert::Refute::Engine::More;
 
 use strict;
 use warnings;
@@ -6,18 +6,18 @@ our $VERSION = 0.03;
 
 =head1 NAME
 
-Test::Contract::Engine::More - Test::Contract backend compatible with Test::More
+Assert::Refute::Engine::More - Assert::Refute backend compatible with Test::More
 
 =head1 DESCRIPTION
 
-This module allows Test::Contract tests to play nice with Test::More and friends.
+This module allows Assert::Refute tests to play nice with Test::More and friends.
 
 =cut
 
 use Carp;
 use Test::Builder;
 
-use parent qw(Test::Contract);
+use parent qw(Assert::Refute);
 
 sub _NEWOPTIONS { return __PACKAGE__->SUPER::_NEWOPTIONS, qw(test_builder) };
 
@@ -38,7 +38,7 @@ sub new {
 
 =head2 refute( $condition, $message )
 
-See L<Test::Contract>. This is L<Test::Builder>-based implementation.
+See L<Assert::Refute>. This is L<Test::Builder>-based implementation.
 
 =cut
 
@@ -46,7 +46,7 @@ sub refute {
     my ($self, $cond, $mess) = @_;
 
     local $Test::Builder::Level = $Test::Builder::Level
-        + (caller()->isa("Test::Contract") ? 2 : 1);
+        + (caller()->isa("Assert::Refute") ? 2 : 1);
 
     if ($cond) {
         # something not right

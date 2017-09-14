@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Contract::Engine::More;
+use Assert::Refute::Engine::More;
 
 ok (1, "test 1");
-my $c = Test::Contract::Engine::More->new;
+my $c = Assert::Refute::Engine::More->new;
 
 $c->ok( 2, "test 2" );
 

@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Engine::TAP::Reader;
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Engine::TAP::Reader;
 
 pipe( my $read, my $write )
     or do {
@@ -11,8 +11,8 @@ pipe( my $read, my $write )
         exit 0;
     };
 
-my $c = Test::Contract::Engine::TAP->new( out => $write );
-my $tap = Test::Contract::Engine::TAP::Reader->new( in => $read );
+my $c = Assert::Refute::Engine::TAP->new( out => $write );
+my $tap = Assert::Refute::Engine::TAP::Reader->new( in => $read );
 
 $c->ok( 1, "fine" );
 $c->refute( "reason", "not fine" );

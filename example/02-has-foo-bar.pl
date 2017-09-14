@@ -10,8 +10,8 @@ use warnings;
 use File::Basename;
 use lib dirname(__FILE__)."/../lib";
 
-use Test::Contract qw(contract);
-use Test::Contract::Basic;
+use Assert::Refute qw(contract);
+use Assert::Refute::Basic;
 
 my $module = shift;
 if (!$module) {

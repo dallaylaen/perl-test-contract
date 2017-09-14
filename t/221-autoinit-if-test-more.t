@@ -6,7 +6,7 @@ use warnings;
 {
     package My::Test;
     use Exporter qw(import);
-    use Test::Contract::Engine::Build;
+    use Assert::Refute::Engine::Build;
     build_refute my_ok => sub { !shift }, export => 1;
 };
 

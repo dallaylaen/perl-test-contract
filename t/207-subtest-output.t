@@ -2,14 +2,14 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Engine::TAP;
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Engine::TAP;
 
 my $output;
 open (my $fd, ">", \$output)
     or die "Redirect failed";
 
-my $c = Test::Contract::Engine::TAP->new( out => $fd );
+my $c = Assert::Refute::Engine::TAP->new( out => $fd );
 
 contract {
     ok 1;

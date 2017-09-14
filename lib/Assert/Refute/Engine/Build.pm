@@ -1,4 +1,4 @@
-package Test::Contract::Engine::Build;
+package Assert::Refute::Engine::Build;
 
 use strict;
 use warnings;
@@ -6,11 +6,11 @@ our $VERSION = 0.0302;
 
 =head1 NAME
 
-Test::Contract::Engine::Build - tool for extending Test::Contract suite
+Assert::Refute::Engine::Build - tool for extending Assert::Refute suite
 
 =head1 DESCRIPTION
 
-Unfortunately, extending L<Test::Contract> is not completely straightforward.
+Unfortunately, extending L<Assert::Refute> is not completely straightforward.
 
 In order to create a new test function, one needs to:
 
@@ -21,9 +21,9 @@ and a brief description of the problem on failure
 (e.g. C<"$got != $expected">);
 
 =item * build an exportable wrapper around it that would talk to
-the most up-to-date L<Test::Contract> instance;
+the most up-to-date L<Assert::Refute> instance;
 
-=item * add a method with the same name to L<Test::Contract>
+=item * add a method with the same name to L<Assert::Refute>
 so that object-oriented and functional interfaces
 are as close to each other as possible.
 
@@ -38,7 +38,7 @@ Hence this module.
 Extending the test suite goes as follows:
 
     package My::Package;
-    use Test::Contract::Engine::Build;
+    use Assert::Refute::Engine::Build;
     use parent qw(Exporter);
 
     build_refute is_everything => sub {
@@ -50,7 +50,7 @@ Extending the test suite goes as follows:
 
 This can be later used either inside production code to check a condition:
 
-    use Test::Contract;
+    use Assert::Refute;
     use My::Package;
     my $c = contract {
         is_everything( $foo );
@@ -72,7 +72,7 @@ This call will create a prototyped function is_everything(...) in the calling
 package, with C<args> positional parameters and an optional human-readable
 message. (Think C<ok 1>, C<ok 1 'test passed'>).
 
-Such function will perform the check under both Test::Contract and
+Such function will perform the check under both Assert::Refute and
 L<Test::More>.
 
 =head1 FUNCTIONS
@@ -89,8 +89,8 @@ our @EXPORT_OK = qw(contract_engine_push contract_engine_cleanup);
 
 =head2 build_refute name => CODE, %options
 
-Create a function in calling package and a method in L<Test::Contract>.
-As a side effect, Test::Contract's internals are added to the caller's
+Create a function in calling package and a method in L<Assert::Refute>.
+As a side effect, Assert::Refute's internals are added to the caller's
 C<@CARP_NOT> array so that carp/croak points to actual outside usage.
 
 B<NOTE> One needs to use Exporter explicitly if either C<export>
@@ -106,7 +106,7 @@ Options may include:
 =item * export_ok => 1 - add function to @EXPORT_OK (don't export by default).
 
 =item * no_create => 1 - don't generate a function at all, just add to
-L<Test::Contract>'s methods.
+L<Assert::Refute>'s methods.
 
 =item * args => nnn - number of arguments. This will prototype function
 to accept nnn scalars + optional descripotion.
@@ -133,7 +133,7 @@ $known{$_}++ for qw(args list block no_proto
 sub build_refute(@) { ## no critic # Moose-like DSL for the win!
     my ($name, $cond, %opt) = @_;
 
-    my $class = "Test::Contract";
+    my $class = "Assert::Refute";
 
     if (my $backend = ( $class->can($name) ? $class : $Backend{$name} ) ) {
         croak "build_refute(): '$name' already registered by $backend";
@@ -202,7 +202,7 @@ sub build_refute(@) { ## no critic # Moose-like DSL for the win!
 
 =head2 contract_engine
 
-Returns the L<Test::Contract> instance performing tests at the moment.
+Returns the L<Assert::Refute> instance performing tests at the moment.
 
 If there's none, an exception is thrown. As an exception,
 if Test::Builder is detected an engine will be created on the fly.
@@ -215,13 +215,13 @@ sub contract_engine() { ## no critic
     if (!@stack) {
         if ( Test::Builder->can("new") and Test::Builder->can("ok")) {
             eval {
-                require Test::Contract::Engine::More;
-                push @stack, Test::Contract::Engine::More->new;
+                require Assert::Refute::Engine::More;
+                push @stack, Assert::Refute::Engine::More->new;
                 1;
             } and return $stack[-1];
             carp "Failed to load Test::Builder-compatible backend: $@";
         };
-        croak "FATAL: Test::Contract: Not currently testing anything";
+        croak "FATAL: Assert::Refute: Not currently testing anything";
     };
     return $stack[-1];
 };
@@ -232,7 +232,7 @@ Make C<$contract> the default engine until it's detroyed, or done_testing is
 called. This is useful for stuff like subtests.
 As the name suggests, may be called multiple times, creating a stack.
 
-C<$contract> must be a L<Test::Contract> descendant.
+C<$contract> must be a L<Assert::Refute> descendant.
 
 If C<$contract> goes out of scope, it is automatically removed from the stack.
 (See C<weaken> in L<Scalar::Util>).
@@ -246,8 +246,8 @@ Not exported by default.
 
 sub contract_engine_push {
     my $eng = shift;
-    blessed $eng and $eng->isa( "Test::Contract" )
-        or croak( "contract_engine_push(): won't load anything but Test::Contract" );
+    blessed $eng and $eng->isa( "Assert::Refute" )
+        or croak( "contract_engine_push(): won't load anything but Assert::Refute" );
     push @stack, $eng;
     weaken $stack[-1];
     return scalar @stack;
@@ -315,7 +315,7 @@ sub to_scalar {
 
 =head2 contract_engine_init
 
-If Test::Contract engine stack is empty, create an engine assuming we're
+If Assert::Refute engine stack is empty, create an engine assuming we're
 in a test script. A L<Test::More> compatibility layer will be loaded
 if needed.
 
@@ -330,18 +330,18 @@ sub contract_engine_init {
     return if $main_engine and $main_pid == $$;
 
     if (Test::Builder->can("ok")) {
-        require Test::Contract::Engine::More;
-        $main_engine = Test::Contract::Engine::More->new;
+        require Assert::Refute::Engine::More;
+        $main_engine = Assert::Refute::Engine::More->new;
     } else {
-        require Test::Contract::Engine::TAP;
-        $main_engine = Test::Contract::Engine::TAP->new;
+        require Assert::Refute::Engine::TAP;
+        $main_engine = Assert::Refute::Engine::TAP->new;
     };
     $main_engine->start_testing;
     $main_pid = $$;
 };
 
 END {
-    if ($main_engine and $main_engine->isa("Test::Contract::Engine::TAP") and $main_pid == $$) {
+    if ($main_engine and $main_engine->isa("Assert::Refute::Engine::TAP") and $main_pid == $$) {
         carp "Test::More loaded by accident, but Test::Refute is not in compat mode!"
             if Test::Builder->can("ok");
         if ($main_engine->get_count) {

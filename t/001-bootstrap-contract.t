@@ -3,15 +3,15 @@
 use strict;
 use warnings FATAL => qw(all);
 
-# This is a Test::Contract::Unit bootstrap script.
-# We don't have Test::Contract::Unit yet to prove that Test::Contract::Unit works.
+# This is a Assert::Refute::Unit bootstrap script.
+# We don't have Assert::Refute::Unit yet to prove that Assert::Refute::Unit works.
 # So we bootstrap it in several stages.
 # First, we postulate a naive my_is( $got, $expected, $comment ) function
 #     that just works due to its simplicity.
 # Also we add a strip() function that is basically a regexp
 #     filtering out comments.
 # Then, we use these (and Perl's IO redirection) to prove that
-#     Test::Contract::Engine::TAP works as expected, ESPECIALLY when
+#     Assert::Refute::Engine::TAP works as expected, ESPECIALLY when
 #     something is wrong (fail tests, bail out etc).
 # Then, we use my_is() to prove that contract { ... } really does what it's
 #     supposed to do. At least that it can output a failing contract.
@@ -25,15 +25,15 @@ sub strip;
 # my_is(42, 42, "is works");
 # my_is(42, 43, "is fails");
 
-require Test::Contract::Engine::TAP;
-my_is !!Test::Contract->can("new"), 1, "Test::Contract present";
+require Assert::Refute::Engine::TAP;
+my_is !!Assert::Refute->can("new"), 1, "Assert::Refute present";
 
 # Abbreviate capture
 sub capture {
     my $to = shift;
     open (my $fd, ">", $to)
         or die "Redirect failed: $!";
-    return Test::Contract::Engine::TAP->new( out => $fd );
+    return Assert::Refute::Engine::TAP->new( out => $fd );
 };
 
 my $c;
@@ -83,12 +83,12 @@ my_is( $output, "## note{}\n# diag[]\n", "note/diag work");
 
 print "# Testing contract...\n";
 
-Test::Contract->import("contract");
+Assert::Refute->import("contract");
 sub contract (&;$); ## no critic # this dies if we change proto
 
 $c = contract {
 };
-my_is ref $c, "Test::Contract", "contract yields T::R::Contract";
+my_is ref $c, "Assert::Refute", "contract yields T::R::Contract";
 my_is $c->get_count, 0, "Nothing done";
 my_is $c->get_error_count, 0, "No errors";
 my_is !$c->get_passing, "", "valid = true";
@@ -98,7 +98,7 @@ $c = contract {
     $_[0]->refute(0, "pass");
     $_[0]->refute(1, "fail");
 };
-my_is ref $c, "Test::Contract", "(2) contract yields T::R::Contract";
+my_is ref $c, "Assert::Refute", "(2) contract yields T::R::Contract";
 my_is $c->get_count, 2, "count = 2";
 my_is $c->get_error_count, 1, "error = 1";
 my_is !$c->get_passing, 1, "valid = false";
@@ -114,7 +114,7 @@ my_is (!!$fail->{1}, "", "contract pass 1");
 my_is (!!$fail->{2}, 1,  "contract fail 2");
 my_is ($c->get_sign, "t10d", "contract signature as expected");
 
-print "# Now some fork to check the whole Test::Contract::Unit magic is there\n";
+print "# Now some fork to check the whole Assert::Refute::Unit magic is there\n";
 
 my ($pipe_r, $pipe_w);
 pipe ($pipe_r, $pipe_w)
@@ -127,11 +127,11 @@ if (!$pid) {
     # CHILD
     open STDOUT, ">&", $pipe_w;
     close $pipe_r;
-    require Test::Contract::Unit;
-    Test::Contract::Unit->import( "no_plan" );
+    require Assert::Refute::Unit;
+    Assert::Refute::Unit->import( "no_plan" );
     is (42, 43, "fail");
     like (42, qr/\d+/, "pass");
-    new_ok( "Test::Contract" ); # ok, too
+    new_ok( "Assert::Refute" ); # ok, too
     done_testing();
     exit;
     # END CHILD
@@ -154,7 +154,7 @@ waitpid( -1, 0 );
 my_is $?>>8, 1, "returned 1 for 1 failed test";
 
 print "# Done testing...\n";
-print "# If passed, at least Test::Contract::Unit, contract{...},\n";
+print "# If passed, at least Assert::Refute::Unit, contract{...},\n";
 print "#     and \$contract->get_sign can be used without much risk\n";
 
 sub strip {

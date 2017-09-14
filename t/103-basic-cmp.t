@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit q(no_plan);
-use Test::Contract::Exception;
+use Assert::Refute::Unit q(no_plan);
+use Assert::Refute::Exception;
 
 my $c = contract {
     cmp_ok 1, "<", 2;

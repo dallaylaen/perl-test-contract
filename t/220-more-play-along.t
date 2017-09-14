@@ -2,11 +2,11 @@
 
 use strict;
 use warnings;
-use Test::Contract::Engine::TAP;
+use Assert::Refute::Engine::TAP;
 
 sub fork_is (&@); ## no critic
 
-my $tap = Test::Contract::Engine::TAP->new;
+my $tap = Assert::Refute::Engine::TAP->new;
 
 fork_is {
     # Need to die on redefines. No, just fatal warns won't cut it.
@@ -15,8 +15,8 @@ fork_is {
     # Use by hand
     require Test::More;
     Test::More->import();
-    require Test::Contract::Unit;
-    Test::Contract::Unit->import();
+    require Assert::Refute::Unit;
+    Assert::Refute::Unit->import();
 
     ok (1, "All good so far" );
     my $c = contract( sub {
@@ -26,7 +26,7 @@ fork_is {
     } );
 
     contract_is( $c, "01", "T::C specific" );
-    my $main = Test::Contract::Unit->engine;
+    my $main = Assert::Refute::Unit->engine;
     $main->diag("diag something");
     $main->note("note something");
 
@@ -52,11 +52,11 @@ fork_is {
     # Use by hand
     require Test::More;
     Test::More->import();
-    require Test::Contract::Unit;
-    Test::Contract::Unit->import();
+    require Assert::Refute::Unit;
+    Assert::Refute::Unit->import();
 
     ok (1, "pass" );
-    my $c = Test::Contract::Unit->engine;
+    my $c = Assert::Refute::Unit->engine;
 
     note( "count=", $c->get_count );
     note( "error=", $c->get_error_count );

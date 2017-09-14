@@ -1,4 +1,4 @@
-package Test::Contract::Warn;
+package Assert::Refute::Warn;
 
 use strict;
 use warnings;
@@ -6,12 +6,12 @@ our $VERSION = 0.0301;
 
 =head1 NAME
 
-Test::Contract::Warn - make sure a BLOCK warns exactly as expected
+Assert::Refute::Warn - make sure a BLOCK warns exactly as expected
 
 =head1 SYNOPSIS
 
     use Test::More;
-    use Test::Contract::Warn;
+    use Assert::Refute::Warn;
 
     warns_like {
         warn "food";
@@ -28,7 +28,7 @@ All functions here are exported by default.
 
 use Exporter qw(import);
 
-use Test::Contract::Engine::Build;
+use Assert::Refute::Engine::Build;
 
 =head2 warns_like { CODE; } ["warn", qr/or warn/], "Explanation";
 

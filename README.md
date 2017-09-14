@@ -1,10 +1,10 @@
 # NAME
 
-Test::Contract - an object-oriented testing and assertion tool.
+Assert::Refute - an object-oriented testing and assertion tool.
 
 # DESCRIPTION
 
-Test::Contract is there to add series of 
+Assert::Refute is there to add series of 
 [Test::More](https://metacpan.org/pod/Test::More)-like assertions
 into production code without turning the whole application
 into a test script.
@@ -14,7 +14,7 @@ complex piece of data, or checking that different implementations
 (PP vs XS and more) behave the same.
 
 Also it's fairly easy to extend it with new conditions that will
-play along nicely with both Test::More and Test::Contract.
+play along nicely with both Test::More and Assert::Refute.
 
 # IN-APP CHECKS
 
@@ -24,7 +24,7 @@ meets certain criteria:
     use strict;
     use warnings;
 
-    use Test::Contract;
+    use Assert::Refute;
 
     my $c = contract {
         $_[0]->like( $user_input, qr/.../, "Format as expected" );
@@ -40,17 +40,17 @@ meets certain criteria:
 The `contract { CODE; }` block would produce an object containing the result of
 the checks. It will also mark the contract as failed if `CODE` dies.
 
-If more fine-grained control is needed, a `Test::Contract->new` is there
+If more fine-grained control is needed, a `Assert::Refute->new` is there
 to make a fresh contract object.
 
 Contracts can be nested just fine.
 
 *All* of `Test::More`'s assertions have a corresponding method
-in `Test::Contract`.
+in `Assert::Refute`.
 
 # EXTENDING THE ARSENAL
 
-The most basic check in `Test::Contract` is
+The most basic check in `Assert::Refute` is
 `$contract->refute( $what_went_unexpected, $why_we_care_about_it );`.
 This may be viewed as an *inverted* `ok` or `assert`:
 
@@ -73,12 +73,12 @@ So all one needs to build a new assertion is to create a function
 that returns false when its arguments are fine, and an explanation of failure
 when they are not.
 
-A `Test::Contract::Engine::Build` module exists to simplify the task further:
+A `Assert::Refute::Engine::Build` module exists to simplify the task further:
 
     package My::Check;
     use Exporter qw(import);
 
-    use Test::Contract::Engine::Build;
+    use Assert::Refute::Engine::Build;
     build_refute my_check => sub {
         my ($got, $expected) = @_;
         # ... a big and nasty check here
@@ -87,7 +87,7 @@ A `Test::Contract::Engine::Build` module exists to simplify the task further:
     1;
 
 This would create an exported function called `my_check` in `My::Check`, as
-well as a `my_check` method in `Test::Contract` itself. So the following code
+well as a `my_check` method in `Assert::Refute` itself. So the following code
 is going to be correct:
 
     use Test::More tests => 1;
@@ -98,10 +98,10 @@ is going to be correct:
 And this one, too:
 
     # inside a running application
-    use Test::Contract;
+    use Assert::Refute;
     use My::Check(); # don't pollute global namespace
 
-    my $c = Test::Contract->new;
+    my $c = Assert::Refute->new;
     $c->my_check( $foo, $bar, "runtime-generated foo is fine, too" );
     if (!$c->get_passing) {
         # ouch, something went wrong with $foo and $bar
@@ -110,7 +110,7 @@ And this one, too:
 It is also possible to validate the testing module itself, outputting details
 on specifically the tests with unexpected results:
 
-    use Test::Contract::Unit;
+    use Assert::Refute::Unit;
     use My::Check;
 
     my $c = contract {
@@ -123,7 +123,7 @@ on specifically the tests with unexpected results:
     is_contract $c, "1100", "my_check works as expected";
     done_testing;
 
-`Test::Contract::Unit` may be intermixed with regular `Test::More`, as long
+`Assert::Refute::Unit` may be intermixed with regular `Test::More`, as long
 as it comes AFTER `Test::More`.
 
 # A LITTLE PHILOSOPHY

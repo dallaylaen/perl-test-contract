@@ -1,4 +1,4 @@
-package Test::Contract::Tempfile;
+package Assert::Refute::Tempfile;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ our $VERSION = 0.03;
 
 =head1 NAME
 
-Test::Contract::Tempfile - self-destructing temporary files for Test::Contract
+Assert::Refute::Tempfile - self-destructing temporary files for Assert::Refute
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 use File::Temp qw(tempfile tempdir);
 use parent qw(Exporter);
 
-use Test::Contract::Engine::Build;
+use Assert::Refute::Engine::Build;
 
 our @EXPORT_OK = qw(mktemp);
 
@@ -44,7 +44,7 @@ sub new {
     my ($class, %opt) = @_;
 
     $opt{contract} ||= contract_engine
-        or croak "$class->new: contract option is required and must be a Test::Contract";
+        or croak "$class->new: contract option is required and must be a Assert::Refute";
 
     my $self = bless { contract => $opt{contract} }, $class;
 

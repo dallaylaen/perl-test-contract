@@ -1,4 +1,4 @@
-package Test::Contract::Unit;
+package Assert::Refute::Unit;
 
 use 5.006;
 use strict;
@@ -7,7 +7,7 @@ our $VERSION = 0.0303;
 
 =head1 NAME
 
-Test::Contract::Unit - Object-oriented testing and assertion tool
+Assert::Refute::Unit - Object-oriented testing and assertion tool
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ The following is a prove-compatible test script. (See L<Test::More>).
 
     use strict;
     use warnings;
-    use Test::Contract::Unit;
+    use Assert::Refute::Unit;
 
     use_ok( "My::Module" );
 
@@ -26,8 +26,8 @@ The following is a prove-compatible test script. (See L<Test::More>).
 However, it can also work inside an application (this is also how subtest are
 implemented):
 
-    use Test::Contract qw(contract);
-    use Test::Contract::Unit;
+    use Assert::Refute qw(contract);
+    use Assert::Refute::Unit;
 
     my $contract = contract {
         is ($user_input->{foo}, $bar, "Input as expected" );
@@ -37,9 +37,9 @@ implemented):
         ...
     };
 
-See L<Test::Contract> for more information about the OO interface.
+See L<Assert::Refute> for more information about the OO interface.
 
-See L<Test::Contract::Engine::Build> for information about
+See L<Assert::Refute::Engine::Build> for information about
 building new assertions and/or custom test modules.
 
 =head1 EXPORT
@@ -52,16 +52,16 @@ All functions in this module are exported by default.
 
 use Carp;
 
-use Test::Contract::Engine::Build;
-use Test::Contract::Basic;
-use Test::Contract qw(contract);
-use Test::Contract::Basic::Deep;
+use Assert::Refute::Engine::Build;
+use Assert::Refute::Basic;
+use Assert::Refute qw(contract);
+use Assert::Refute::Basic::Deep;
 
 use parent qw(Exporter);
 my @wrapper = qw(done_testing bail_out subtest);
 my @own = qw(BAIL_OUT explain plan skip $TODO pass fail not_ok);
 my @reexport = qw(contract is_deeply plan);
-our @EXPORT = (@own, @wrapper, @reexport, @Test::Contract::Basic::EXPORT);
+our @EXPORT = (@own, @wrapper, @reexport, @Assert::Refute::Basic::EXPORT);
 our $TODO; # unimplemented - use contract instead!
 
 # FIXME Have to use ugly hacks for Test::More compatibility
@@ -85,7 +85,7 @@ sub import {
         @_    = ($self, @rest);
     };
 
-    Test::Contract::Engine::Build->contract_engine_init;
+    Assert::Refute::Engine::Build->contract_engine_init;
     plan( tests => $plan )
         if $plan;
 
@@ -94,7 +94,7 @@ sub import {
 
 =head1 TESTS
 
-See L<Test::Contract::Basic> for checks allowed by default.
+See L<Assert::Refute::Basic> for checks allowed by default.
 
 =head2 plan tests => nnn
 
@@ -230,16 +230,16 @@ foreach (@wrapper) {
 
 Run an enclosed set of tests, recording the results for future analysis.
 Returns a contract object.
-See GETTERS in L<Test::Contract> for reference.
+See GETTERS in L<Assert::Refute> for reference.
 
 =cut
 
 =head1 MANAGEMENT
 
 These functions are not exported and should be called as
-normal methods, i.e. Test::Contract->func( args );
+normal methods, i.e. Assert::Refute->func( args );
 
-=head2 Test::Contract->engine();
+=head2 Assert::Refute->engine();
 
 Returns current default contract engine.
 Engines are organised into a stack and the top of the stack is always returned.
@@ -265,14 +265,14 @@ Konstantin S. Uvarin, C<< <khedin at gmail.com> >>
 This is alpha software, lots of bugs guaranteed.
 
 Please report any bugs or feature requests to C<bug-test-refute at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Contract>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Assert-Refute>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Test::Contract
+    perldoc Assert::Refute
 
 You can also look for information at:
 
@@ -280,19 +280,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Contract>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Assert-Refute>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Test-Contract>
+L<http://annocpan.org/dist/Assert-Refute>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Test-Contract>
+L<http://cpanratings.perl.org/d/Assert-Refute>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Test-Contract/>
+L<http://search.cpan.org/dist/Assert-Refute/>
 
 =back
 
@@ -342,4 +342,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Test::Contract::Unit
+1; # End of Assert::Refute::Unit

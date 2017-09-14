@@ -1,4 +1,4 @@
-package Test::Contract::Unit::Fake;
+package Assert::Refute::Unit::Fake;
 
 use strict;
 use warnings;
@@ -6,12 +6,12 @@ our $VERSION = 0.03;
 
 =head1 NAME
 
-Test::Contract::Unit::Fake - Test::More compatibility test for Test::Contract
+Assert::Refute::Unit::Fake - Test::More compatibility test for Assert::Refute
 
 =head1 STOP!
 
 This module pretends to load L<Test::More>, which it doesn't.
-It is only here to test how Test::Contract::Unit
+It is only here to test how Assert::Refute::Unit
 behaves in place of Test::More
 without having to rewrite lot of test scripts.
 
@@ -33,7 +33,7 @@ sub import {
 =head2 fake_test_more
 
 Try to detect real Test::More and Test::Simple.
-If none are found, replace them with L<Test::Contract::Unit>
+If none are found, replace them with L<Assert::Refute::Unit>
 and change %INC accordingly.
 
 If L<Test::Builder> is detected later, complain about it.
@@ -53,12 +53,12 @@ sub fake_test_more {
         } else {
             # Do the fake loading
 
-            require Test::Contract::Unit;
+            require Assert::Refute::Unit;
 
-            _pretend( 'Test::Contract::Unit', 'Test::More' );
+            _pretend( 'Assert::Refute::Unit', 'Test::More' );
             $INC{"Test/More.pm"} = __FILE__;
 
-            _pretend( 'Test::Contract::Unit', 'Test::Simple' );
+            _pretend( 'Assert::Refute::Unit', 'Test::Simple' );
             $INC{"Test/Simple.pm"} = __FILE__;
 
             $do_fake++;

@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit;
-use Test::Contract::Warn;
+use Assert::Refute::Unit;
+use Assert::Refute::Warn;
 
 warns_like {
     contract_is contract {

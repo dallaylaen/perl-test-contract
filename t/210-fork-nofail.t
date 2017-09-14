@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Contract::Unit tests => 2;
+use Assert::Refute::Unit tests => 2;
 
 ok (1, "pass");
 

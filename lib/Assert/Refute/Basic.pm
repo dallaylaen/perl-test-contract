@@ -1,4 +1,4 @@
-package Test::Contract::Basic;
+package Assert::Refute::Basic;
 
 use strict;
 use warnings;
@@ -6,14 +6,14 @@ our $VERSION = 0.0305;
 
 =head1 NAME
 
-Test::Contract::Basic - a set of most common tests for Test::Contract suite
+Assert::Refute::Basic - a set of most common tests for Assert::Refute suite
 
 =head1 DESCRIPTION
 
 This module contains most common test conditions similar to those in
 L<Test::More>, like C<is $got, $expected;> or C<like $got, qr/.../;>.
 
-Using L<Test::Contract::Unit> would imply being inside a unit test script,
+Using L<Assert::Refute::Unit> would imply being inside a unit test script,
 whereas this module would just export some testing functions.
 
 =head1 FUNCTIONS
@@ -26,21 +26,21 @@ exported by default. Scalar context is imposed onto arguments, so
 would actually compare arrays by length.
 
 If a C<contract { ... }> is in action, the results of each assertion
-will be recorded there. See L<Test::Contract> for more.
-If L<Test::Contract::Unit>/L<Test::More> is in action,
+will be recorded there. See L<Assert::Refute> for more.
+If L<Assert::Refute::Unit>/L<Test::More> is in action,
 a unit testing script is assumed.
 If neither is true, an exception is thrown.
 
-In addition, a C<Test::Contract-E<gt>function_name> method with
+In addition, a C<Assert::Refute-E<gt>function_name> method with
 the same signature is generated for each of them
-(see L<Test::Contract::Engine::Build>).
+(see L<Assert::Refute::Engine::Build>).
 
 =cut
 
 use Carp;
 use Scalar::Util qw(blessed looks_like_number);
 use parent qw(Exporter);
-use Test::Contract::Engine::Build;
+use Assert::Refute::Engine::Build;
 our @EXPORT = qw(diag note);
 
 =head2 is $got, $expected, "explanation"
@@ -281,7 +281,7 @@ build_refute contract_is => sub {
         };
     };
 
-    croak "Impossible: contract_is broken. File a bug in Test::Contract immediately!"
+    croak "Impossible: contract_is broken. File a bug in Assert::Refute immediately!"
         if !@fail;
     return join "\n", @fail;
 }, args => 2, export => 1;
